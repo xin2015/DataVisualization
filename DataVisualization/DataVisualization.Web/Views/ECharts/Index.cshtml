@@ -1,0 +1,240 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Global wind visualization</title>
+    <style>
+        body, html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            font-family: "Microsoft YaHei"
+        }
+
+        #main {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="main"></div>
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+    <script type="text/javascript" src="//api.map.baidu.com/api?v=3.0&ak=E4805d16520de693a3fe707cdc962045"></script>
+    <script src="~/Scripts/echarts/echarts.js"></script>
+    <script src="~/Scripts/echarts/echarts-gl.js"></script>
+    <script src="~/Scripts/echarts/extension/bmap.js"></script>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('main'));
+        $.getJSON('/Scripts/data/winds.json', function (windData) {
+            var data = [];
+            var p = 0;
+            var maxMag = 0;
+            var minMag = Infinity;
+            for (var j = 0; j < windData.ny; j++) {
+                for (var i = 0; i <= windData.nx; i++) {
+                    // Continuous data.
+                    var p = (i % windData.nx) + j * windData.nx;
+                    var vx = windData.data[p][0];
+                    var vy = windData.data[p][1];
+                    var mag = Math.sqrt(vx * vx + vy * vy);
+                    // 数据是一个一维数组
+                    // [ [经度, 维度，向量经度方向的值，向量维度方向的值] ]
+                    data.push([
+                        i / windData.nx * 360 - 180,
+                        j / windData.ny * 180 - 90,
+                        vx,
+                        vy,
+                        mag
+                    ]);
+                    maxMag = Math.max(mag, maxMag);
+                    minMag = Math.min(mag, minMag);
+                }
+            }
+            myChart.setOption(option = {
+                visualMap: {
+                    left: 'right',
+                    min: minMag,
+                    max: maxMag,
+                    dimension: 4,
+                    inRange: {
+                        // color: ['green', 'yellow', 'red']
+                        color: ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#ffffbf', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+                    },
+                    realtime: false,
+                    calculable: true,
+                    textStyle: {
+                        color: '#fff'
+                    }
+                },
+                bmap: {
+                    center: [107.123407, 36.028857],
+                    zoom: 6,
+                    roam: true,
+                    mapStyle: {
+                        'styleJson': [
+                            {
+                                'featureType': 'water',
+                                'elementType': 'all',
+                                'stylers': {
+                                    'color': '#031628'
+                                }
+                            },
+                            {
+                                'featureType': 'land',
+                                'elementType': 'geometry',
+                                'stylers': {
+                                    'color': '#000102'
+                                }
+                            },
+                            {
+                                'featureType': 'highway',
+                                'elementType': 'all',
+                                'stylers': {
+                                    'visibility': 'off'
+                                }
+                            },
+                            {
+                                'featureType': 'arterial',
+                                'elementType': 'geometry.fill',
+                                'stylers': {
+                                    'color': '#000000'
+                                }
+                            },
+                            {
+                                'featureType': 'arterial',
+                                'elementType': 'geometry.stroke',
+                                'stylers': {
+                                    'color': '#0b3d51'
+                                }
+                            },
+                            {
+                                'featureType': 'local',
+                                'elementType': 'geometry',
+                                'stylers': {
+                                    'color': '#000000'
+                                }
+                            },
+                            {
+                                'featureType': 'railway',
+                                'elementType': 'geometry.fill',
+                                'stylers': {
+                                    'color': '#000000'
+                                }
+                            },
+                            {
+                                'featureType': 'railway',
+                                'elementType': 'geometry.stroke',
+                                'stylers': {
+                                    'color': '#08304b'
+                                }
+                            },
+                            {
+                                'featureType': 'subway',
+                                'elementType': 'geometry',
+                                'stylers': {
+                                    'lightness': -70
+                                }
+                            },
+                            {
+                                'featureType': 'building',
+                                'elementType': 'geometry.fill',
+                                'stylers': {
+                                    'color': '#000000'
+                                }
+                            },
+                            {
+                                'featureType': 'all',
+                                'elementType': 'labels.text.fill',
+                                'stylers': {
+                                    'color': '#857f7f'
+                                }
+                            },
+                            {
+                                'featureType': 'all',
+                                'elementType': 'labels.text.stroke',
+                                'stylers': {
+                                    'color': '#000000'
+                                }
+                            },
+                            {
+                                'featureType': 'building',
+                                'elementType': 'geometry',
+                                'stylers': {
+                                    'color': '#022338'
+                                }
+                            },
+                            {
+                                'featureType': 'green',
+                                'elementType': 'geometry',
+                                'stylers': {
+                                    'color': '#062032'
+                                }
+                            },
+                            {
+                                'featureType': 'boundary',
+                                'elementType': 'all',
+                                'stylers': {
+                                    'color': '#465b6c'
+                                }
+                            },
+                            {
+                                'featureType': 'manmade',
+                                'elementType': 'all',
+                                'stylers': {
+                                    'color': '#022338'
+                                }
+                            },
+                            {
+                                'featureType': 'label',
+                                'elementType': 'all',
+                                'stylers': {
+                                    'visibility': 'off'
+                                }
+                            }
+                        ]
+                    }
+                },
+                series: [{
+                    type: 'flowGL',
+                    coordinateSystem: 'bmap',
+                    data: data,
+                    particleDensity: 200,
+                    particleType: 'line',
+                    particleSize: 1,
+                    particleSpeed: 1,
+                    particleTrail: 2,
+                    supersampling: 4,
+                    // gridWidth: windData.nx,
+                    // gridHeight: windData.ny,
+                    itemStyle: {
+                        opacity: 0.6
+                    }
+                }]
+            });
+
+            var bmap = myChart.getModel().getComponent('bmap').getBMap();
+            // 西南角和东北角
+            var SW = new BMap.Point(73.6, 11.2);
+            var NE = new BMap.Point(159.8, 60.2);
+
+            var groundOverlayOptions = {
+                opacity: 1,
+                displayOnMinLevel: 4,
+                displayOnMaxLevel: 14
+            }
+
+            // 初始化GroundOverlay
+            var groundOverlay = new BMap.GroundOverlay(new BMap.Bounds(SW, NE), groundOverlayOptions);
+
+            // 设置GroundOverlay的图片地址
+            groundOverlay.setImageURL('/Content/images/airqualityofchina.png');
+            bmap.addOverlay(groundOverlay);
+        });
+    </script>
+</body>
+</html>
