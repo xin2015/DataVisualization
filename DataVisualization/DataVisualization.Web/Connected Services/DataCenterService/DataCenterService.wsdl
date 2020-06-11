@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="DataCenterService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://cityphoto.suncereltd.cn:18405/DataCenterWCF/DataCenterService.svc?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://cityphoto.suncereltd.cn:18405/DataCenterWCF/DataCenterService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://cityphoto.suncereltd.cn:18405/DataCenterWCF/DataCenterService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/ForecastDataSystem.WCF.Models" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IDataCenterService_GetStationHourDataFromLive_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetStationHourDataFromLive" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetStationHourDataFromLive_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetStationHourDataFromLiveResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetStationHourDataListFromLive_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetStationHourDataListFromLive" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetStationHourDataListFromLive_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetStationHourDataListFromLiveResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetStationHourDataFromHistory_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetStationHourDataFromHistory" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetStationHourDataFromHistory_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetStationHourDataFromHistoryResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetStationHourDataListFromHistoryByTime_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetStationHourDataListFromHistoryByTime" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetStationHourDataListFromHistoryByTime_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetStationHourDataListFromHistoryByTimeResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetStationHourDataListFromHistory_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetStationHourDataListFromHistory" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetStationHourDataListFromHistory_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetStationHourDataListFromHistoryResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityHourDataFromLive_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityHourDataFromLive" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityHourDataFromLive_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityHourDataFromLiveResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityHourDataListFromLive_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityHourDataListFromLive" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityHourDataListFromLive_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityHourDataListFromLiveResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityHourDataFromHistory_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityHourDataFromHistory" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityHourDataFromHistory_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityHourDataFromHistoryResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityHourDataListFromHistoryByTime_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityHourDataListFromHistoryByTime" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityHourDataListFromHistoryByTime_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityHourDataListFromHistoryByTimeResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityHourDataListFromHistory_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityHourDataListFromHistory" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityHourDataListFromHistory_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityHourDataListFromHistoryResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityDayDataFromLive_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityDayDataFromLive" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityDayDataFromLive_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityDayDataFromLiveResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityDayDataListFromLive_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityDayDataListFromLive" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityDayDataListFromLive_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityDayDataListFromLiveResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityDayDataFromHistory_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityDayDataFromHistory" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityDayDataFromHistory_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityDayDataFromHistoryResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityDayDataListFromHistoryByTime_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityDayDataListFromHistoryByTime" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityDayDataListFromHistoryByTime_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityDayDataListFromHistoryByTimeResponse" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityDayDataListFromHistory_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityDayDataListFromHistory" />
+  </wsdl:message>
+  <wsdl:message name="IDataCenterService_GetCityDayDataListFromHistory_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCityDayDataListFromHistoryResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IDataCenterService">
+    <wsdl:operation name="GetStationHourDataFromLive">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDataCenterService/GetStationHourDataFromLive" message="tns:IDataCenterService_GetStationHourDataFromLive_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDataCenterService/GetStationHourDataFromLiveResponse" message="tns:IDataCenterService_GetStationHourDataFromLive_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetStationHourDataListFromLive">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDataCenterService/GetStationHourDataListFromLive" message="tns:IDataCenterService_GetStationHourDataListFromLive_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDataCenterService/GetStationHourDataListFromLiveResponse" message="tns:IDataCenterService_GetStationHourDataListFromLive_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetStationHourDataFromHistory">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDataCenterService/GetStationHourDataFromHistory" message="tns:IDataCenterService_GetStationHourDataFromHistory_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDataCenterService/GetStationHourDataFromHistoryResponse" message="tns:IDataCenterService_GetStationHourDataFromHistory_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetStationHourDataListFromHistoryByTime">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDataCenterService/GetStationHourDataListFromHistoryByTime" message="tns:IDataCenterService_GetStationHourDataListFromHistoryByTime_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDataCenterService/GetStationHourDataListFromHistoryByTimeResponse" message="tns:IDataCenterService_GetStationHourDataListFromHistoryByTime_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetStationHourDataListFromHistory">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDataCenterService/GetStationHourDataListFromHistory" message="tns:IDataCenterService_GetStationHourDataListFromHistory_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDataCenterService/GetStationHourDataListFromHistoryResponse" message="tns:IDataCenterService_GetStationHourDataListFromHistory_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCityHourDataFromLive">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDataCenterService/GetCityHourDataFromLive" message="tns:IDataCenterService_GetCityHourDataFromLive_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDataCenterService/GetCityHourDataFromLiveResponse" message="tns:IDataCenterService_GetCityHourDataFromLive_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCityHourDataListFromLive">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDataCenterService/GetCityHourDataListFromLive" message="tns:IDataCenterService_GetCityHourDataListFromLive_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDataCenterService/GetCityHourDataListFromLiveResponse" message="tns:IDataCenterService_GetCityHourDataListFromLive_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCityHourDataFromHistory">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDataCenterService/GetCityHourDataFromHistory" message="tns:IDataCenterService_GetCityHourDataFromHistory_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDataCenterService/GetCityHourDataFromHistoryResponse" message="tns:IDataCenterService_GetCityHourDataFromHistory_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCityHourDataListFromHistoryByTime">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDataCenterService/GetCityHourDataListFromHistoryByTime" message="tns:IDataCenterService_GetCityHourDataListFromHistoryByTime_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDataCenterService/GetCityHourDataListFromHistoryByTimeResponse" message="tns:IDataCenterService_GetCityHourDataListFromHistoryByTime_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCityHourDataListFromHistory">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDataCenterService/GetCityHourDataListFromHistory" message="tns:IDataCenterService_GetCityHourDataListFromHistory_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDataCenterService/GetCityHourDataListFromHistoryResponse" message="tns:IDataCenterService_GetCityHourDataListFromHistory_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCityDayDataFromLive">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDataCenterService/GetCityDayDataFromLive" message="tns:IDataCenterService_GetCityDayDataFromLive_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDataCenterService/GetCityDayDataFromLiveResponse" message="tns:IDataCenterService_GetCityDayDataFromLive_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCityDayDataListFromLive">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDataCenterService/GetCityDayDataListFromLive" message="tns:IDataCenterService_GetCityDayDataListFromLive_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDataCenterService/GetCityDayDataListFromLiveResponse" message="tns:IDataCenterService_GetCityDayDataListFromLive_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCityDayDataFromHistory">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDataCenterService/GetCityDayDataFromHistory" message="tns:IDataCenterService_GetCityDayDataFromHistory_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDataCenterService/GetCityDayDataFromHistoryResponse" message="tns:IDataCenterService_GetCityDayDataFromHistory_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCityDayDataListFromHistoryByTime">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDataCenterService/GetCityDayDataListFromHistoryByTime" message="tns:IDataCenterService_GetCityDayDataListFromHistoryByTime_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDataCenterService/GetCityDayDataListFromHistoryByTimeResponse" message="tns:IDataCenterService_GetCityDayDataListFromHistoryByTime_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetCityDayDataListFromHistory">
+      <wsdl:input wsaw:Action="http://tempuri.org/IDataCenterService/GetCityDayDataListFromHistory" message="tns:IDataCenterService_GetCityDayDataListFromHistory_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IDataCenterService/GetCityDayDataListFromHistoryResponse" message="tns:IDataCenterService_GetCityDayDataListFromHistory_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IDataCenterService" type="tns:IDataCenterService">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetStationHourDataFromLive">
+      <soap:operation soapAction="http://tempuri.org/IDataCenterService/GetStationHourDataFromLive" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetStationHourDataListFromLive">
+      <soap:operation soapAction="http://tempuri.org/IDataCenterService/GetStationHourDataListFromLive" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetStationHourDataFromHistory">
+      <soap:operation soapAction="http://tempuri.org/IDataCenterService/GetStationHourDataFromHistory" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetStationHourDataListFromHistoryByTime">
+      <soap:operation soapAction="http://tempuri.org/IDataCenterService/GetStationHourDataListFromHistoryByTime" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetStationHourDataListFromHistory">
+      <soap:operation soapAction="http://tempuri.org/IDataCenterService/GetStationHourDataListFromHistory" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCityHourDataFromLive">
+      <soap:operation soapAction="http://tempuri.org/IDataCenterService/GetCityHourDataFromLive" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCityHourDataListFromLive">
+      <soap:operation soapAction="http://tempuri.org/IDataCenterService/GetCityHourDataListFromLive" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCityHourDataFromHistory">
+      <soap:operation soapAction="http://tempuri.org/IDataCenterService/GetCityHourDataFromHistory" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCityHourDataListFromHistoryByTime">
+      <soap:operation soapAction="http://tempuri.org/IDataCenterService/GetCityHourDataListFromHistoryByTime" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCityHourDataListFromHistory">
+      <soap:operation soapAction="http://tempuri.org/IDataCenterService/GetCityHourDataListFromHistory" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCityDayDataFromLive">
+      <soap:operation soapAction="http://tempuri.org/IDataCenterService/GetCityDayDataFromLive" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCityDayDataListFromLive">
+      <soap:operation soapAction="http://tempuri.org/IDataCenterService/GetCityDayDataListFromLive" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCityDayDataFromHistory">
+      <soap:operation soapAction="http://tempuri.org/IDataCenterService/GetCityDayDataFromHistory" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCityDayDataListFromHistoryByTime">
+      <soap:operation soapAction="http://tempuri.org/IDataCenterService/GetCityDayDataListFromHistoryByTime" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetCityDayDataListFromHistory">
+      <soap:operation soapAction="http://tempuri.org/IDataCenterService/GetCityDayDataListFromHistory" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="DataCenterService">
+    <wsdl:port name="BasicHttpBinding_IDataCenterService" binding="tns:BasicHttpBinding_IDataCenterService">
+      <soap:address location="http://cityphoto.suncereltd.cn:18405/DataCenterWCF/DataCenterService.svc" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -49,6 +49,8 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -120,8 +122,15 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Connected Services\DataCenterService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Controllers\EChartsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\KrigingController.cs" />
+    <Compile Include="Controllers\OpenLayersController.cs" />
     <Compile Include="Controllers\WindJSController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -129,6 +138,22 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Connected Services\DataCenterService\DataCenterService.disco" />
+    <None Include="Connected Services\DataCenterService\configuration91.svcinfo" />
+    <None Include="Connected Services\DataCenterService\configuration.svcinfo" />
+    <Content Include="Connected Services\DataCenterService\DataVisualization.Web.DataCenterService.CityDayData.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Content>
+    <Content Include="Connected Services\DataCenterService\DataVisualization.Web.DataCenterService.CityHourData.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Content>
+    <Content Include="Connected Services\DataCenterService\DataVisualization.Web.DataCenterService.StationHourData.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Content>
+    <None Include="Connected Services\DataCenterService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -185,6 +210,16 @@
     <Content Include="Scripts\echarts\map\json\province\zhejiang.json" />
     <Content Include="Scripts\echarts\map\json\world.json" />
     <Content Include="Scripts\data\gfs.json" />
+    <None Include="Connected Services\DataCenterService\DataCenterService.wsdl" />
+    <None Include="Connected Services\DataCenterService\DataCenterService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\DataCenterService\DataCenterService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\DataCenterService\DataCenterService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\echarts\echarts.js" />
     <Content Include="Scripts\echarts\echarts.min.js" />
@@ -238,6 +273,11 @@
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\kriging\kriging.contour.js" />
+    <Content Include="Scripts\kriging\kriging.js" />
+    <Content Include="Scripts\kriging\kriging.xin.js" />
+    <Content Include="Scripts\kriging\kriging-contour.js" />
+    <Content Include="Scripts\kriging\kriging-contour.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Scripts\windjs\plugins\RasterLayer.js" />
     <Content Include="Scripts\windjs\windy.js" />
@@ -264,6 +304,13 @@
     <Content Include="Views\WindJS\Index.cshtml" />
     <Content Include="Views\WindJS\Index2.cshtml" />
     <Content Include="Views\WindJS\Layered.cshtml" />
+    <Content Include="Views\Kriging\Index.cshtml" />
+    <Content Include="Views\Kriging\Index2.cshtml" />
+    <Content Include="Views\Kriging\Test.cshtml" />
+    <Content Include="Views\Kriging\Test2.cshtml" />
+    <Content Include="Views\Kriging\Test3.cshtml" />
+    <Content Include="Views\Kriging\Index3.cshtml" />
+    <Content Include="Views\OpenLayers\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -281,6 +328,12 @@
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.4.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.4.1.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Connected Services\DataCenterService\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

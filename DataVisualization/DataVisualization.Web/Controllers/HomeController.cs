@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataVisualization.Web.DataCenterService;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -25,6 +26,15 @@ namespace DataVisualization.Web.Controllers
             ViewBag.Message = "Your contact page.";
 
             return View();
+        }
+
+        public ActionResult GetStationHourData()
+        {
+            using (DataCenterServiceClient client = new DataCenterServiceClient())
+            {
+                StationHourData[] stationHourData = client.GetStationHourDataListFromLive("normal", "normal!@123");
+                return Json(stationHourData, JsonRequestBehavior.AllowGet);
+            }
         }
     }
 }

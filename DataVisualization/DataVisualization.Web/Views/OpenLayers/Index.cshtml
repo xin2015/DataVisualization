@@ -1,0 +1,197 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="OpenLayers" />
+    <title>OpenLayers</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+    <style type="text/css">
+        body, html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            font-family: "Microsoft YaHei"
+        }
+
+        .mapDiv {
+            width: 100%;
+            height: 100%;
+            float: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="mapDiv" id="mapDiv"></div>
+    <script src="~/Scripts/kriging/kriging.js"></script>
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript">
+        var params = {
+            mapCenter: [104.2, 37.8],
+            zoom: 5,
+            krigingModel: 'exponential',//'exponential','gaussian','spherical'
+            krigingSigma2: 0,
+            krigingAlpha: 100,
+            canvasAlpha: 0.8,//canvas图层透明度
+            colors: ["#00E400", "#FFFF00", "#FF7E00", "#FF0000", "#99004C", "#7E0023"]
+        };
+        var gradient = [{
+            value: 0,
+            r: 125,
+            g: 228,
+            b: 125
+        }, {
+            value: 25,
+            r: 0,
+            g: 228,
+            b: 0
+        }, {
+            value: 75,
+            r: 255,
+            g: 255,
+            b: 0
+        }, {
+            value: 125,
+            r: 255,
+            g: 126,
+            b: 0
+        }, {
+            value: 175,
+            r: 255,
+            g: 0,
+            b: 0
+        }, {
+            value: 250,
+            r: 153,
+            g: 0,
+            b: 76
+        }, {
+            value: 400,
+            r: 126,
+            g: 0,
+            b: 35
+        }, {
+            value: 500,
+            r: 108,
+            g: 0,
+            b: 8
+        }];
+        var chinaExtent = [73.3, 17.5, 135.1, 53.7];
+        var loni = chinaExtent[0], lati = chinaExtent[1], lona = chinaExtent[2], lata = chinaExtent[3];
+        var map = new ol.Map({
+            target: 'mapDiv',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat(params.mapCenter),
+                zoom: params.zoom
+            })
+        });
+        var data = [];
+        $.ajax({
+            url: "/Home/GetStationHourData",
+            success: function (a, b, c) {
+                var lnga = 135, lngi = 74, lata = 54, lati = 18;
+                for (var i = lngi; i < lnga; i += 1) {
+                    for (var j = lati; j < lata; j += 1) {
+                        var lngi = i + 1;
+                        var latj = j + 1;
+                        var count = 0, lngm = 0, latm = 0, valuem = 0;
+                        for (var k in a) {
+                            var item = a[k];
+                            if (item.AQI != "—") {
+                                var longitude = item.Longitude - 0;
+                                var latitude = item.Latitude - 0;
+                                var value = item.AQI - 0;
+                                if (longitude >= i && longitude < lngi && latitude >= j && latitude < latj) {
+                                    count++;
+                                    lngm += longitude;
+                                    latm += latitude;
+                                    valuem += value;
+                                }
+                            }
+                        }
+                        if (count > 0) {
+                            data.push([lngm / count, latm / count, valuem / count]);
+                        }
+                    }
+                }
+
+                //for (var i = 0; i < a.length; i++) {
+                //    var item = a[i];
+                //    if (item.AQI != "—") {
+                //        var longitude = item.Longitude - 0;
+                //        var latitude = item.Latitude - 0;
+                //        var value = item.AQI - 0;
+                //        data.push([longitude, latitude, value]);
+                //    }
+                //}
+
+                InitCanvas();
+            }
+        });
+
+        function InitCanvas() {
+            var lngs = [], lats = [], values = [];
+            for (var i = 0; i < data.length; i++) {
+                lngs.push(data[i][0]);
+                lats.push(data[i][1]);
+                values.push(data[i][2]);
+            }
+            console.time("train");
+            var variogram = kriging.train(values, lngs, lats, params.krigingModel, params.krigingSigma2, params.krigingAlpha);
+            console.timeEnd("train");
+            var imageLayer = new ol.layer.Image({
+                source: new ol.source.ImageCanvas({
+                    canvasFunction: (extent, resolution, pixelRatio, size, projection) => {
+                        console.time("update");
+                        var canvas = document.createElement('canvas');
+                        canvas.width = size[0];
+                        canvas.height = size[1];
+                        var ctx = canvas.getContext("2d");
+                        ctx.globalAlpha = params.canvasAlpha;
+                        var w = 3, m = 1;
+                        for (var x = m; x < canvas.width; x += w) {
+                            for (var y = m; y < canvas.height; y += w) {
+                                var point = map.getCoordinateFromPixel([x, y]);
+                                point = ol.proj.toLonLat(point);
+                                if (point[0] >= loni && point[0] <= lona && point[1] >= lati && point[1] <= lata) {
+                                    var z = kriging.predict(point[0], point[1], variogram);
+                                    // 按AQI渐变
+                                    for (var k = 1, l = 0; k < gradient.length; l = k++) {
+                                        if (z <= gradient[k].value) {
+                                            var t = (gradient[k].value - z) / (gradient[k].value - gradient[l].value);
+                                            r = gradient[k].r - Math.round(t * (gradient[k].r - gradient[l].r));
+                                            g = gradient[k].g - Math.round(t * (gradient[k].g - gradient[l].g));
+                                            b = gradient[k].b - Math.round(t * (gradient[k].b - gradient[l].b));
+                                            break;
+                                        }
+                                    }
+                                    ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
+
+                                    // 按等级
+                                    //ctx.fillStyle = params.colors[Math.floor(z / 50)];
+
+                                    ctx.fillRect(x - m, y - m, w, w);
+                                }
+                            }
+                        }
+
+                        console.timeEnd("update");
+                        return canvas;
+                    },
+                    ratio: 1
+                }),
+                map: map
+            });
+        }
+    </script>
+</body>
+</html>
