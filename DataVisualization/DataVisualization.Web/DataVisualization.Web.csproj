@@ -311,6 +311,9 @@
     <Content Include="Views\Kriging\Test3.cshtml" />
     <Content Include="Views\Kriging\Index3.cshtml" />
     <Content Include="Views\OpenLayers\Index.cshtml" />
+    <Content Include="Views\Kriging\OpenLayers.cshtml" />
+    <Content Include="Views\OpenLayers\Index2.cshtml" />
+    <Content Include="Views\OpenLayers\Index3.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

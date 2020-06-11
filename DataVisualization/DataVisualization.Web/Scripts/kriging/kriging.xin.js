@@ -1,4 +1,17 @@
-﻿Array.prototype.pip = function (x, y) {
+﻿// Extend the Array class
+Array.prototype.max = function () {
+    return Math.max.apply(null, this);
+};
+Array.prototype.min = function () {
+    return Math.min.apply(null, this);
+};
+Array.prototype.mean = function () {
+    var i, sum;
+    for (i = 0, sum = 0; i < this.length; i++)
+        sum += this[i];
+    return sum / this.length;
+};
+Array.prototype.pip = function (x, y) {
     var i, j, c = false;
     for (i = 0, j = this.length - 1; i < this.length; j = i++) {
         if (((this[i][1] > y) != (this[j][1] > y)) &&
@@ -398,6 +411,104 @@ var kriging = function () {
         var K = [k];
         return kriging_matrix_multiply(K, variogram.M, 1, n, 1)[0][0];
     }
+
+    // Gridded matrices
+    kriging.grid = function (polygons, variogram, width) {
+        var i, j, k, n = polygons.length;
+        if (n == 0) return;
+
+        // Boundaries of polygons space
+        var xlim = [polygons[0][0][0], polygons[0][0][0]];
+        var ylim = [polygons[0][0][1], polygons[0][0][1]];
+        for (i = 0; i < n; i++) // Polygons
+            for (j = 0; j < polygons[i].length; j++) { // Vertices
+                if (polygons[i][j][0] < xlim[0])
+                    xlim[0] = polygons[i][j][0];
+                if (polygons[i][j][0] > xlim[1])
+                    xlim[1] = polygons[i][j][0];
+                if (polygons[i][j][1] < ylim[0])
+                    ylim[0] = polygons[i][j][1];
+                if (polygons[i][j][1] > ylim[1])
+                    ylim[1] = polygons[i][j][1];
+            }
+
+        // Alloc for O(n^2) space
+        var xtarget, ytarget;
+        var a = Array(2), b = Array(2);
+        var lxlim = Array(2); // Local dimensions
+        var lylim = Array(2); // Local dimensions
+        var x = Math.ceil((xlim[1] - xlim[0]) / width);
+        var y = Math.ceil((ylim[1] - ylim[0]) / width);
+
+        var A = Array(x + 1);
+        for (i = 0; i <= x; i++) A[i] = Array(y + 1);
+        for (i = 0; i < n; i++) {
+            // Range for polygons[i]
+            lxlim[0] = polygons[i][0][0];
+            lxlim[1] = lxlim[0];
+            lylim[0] = polygons[i][0][1];
+            lylim[1] = lylim[0];
+            for (j = 1; j < polygons[i].length; j++) { // Vertices
+                if (polygons[i][j][0] < lxlim[0])
+                    lxlim[0] = polygons[i][j][0];
+                if (polygons[i][j][0] > lxlim[1])
+                    lxlim[1] = polygons[i][j][0];
+                if (polygons[i][j][1] < lylim[0])
+                    lylim[0] = polygons[i][j][1];
+                if (polygons[i][j][1] > lylim[1])
+                    lylim[1] = polygons[i][j][1];
+            }
+
+            // Loop through polygon subspace
+            a[0] = Math.floor(((lxlim[0] - ((lxlim[0] - xlim[0]) % width)) - xlim[0]) / width);
+            a[1] = Math.ceil(((lxlim[1] - ((lxlim[1] - xlim[1]) % width)) - xlim[0]) / width);
+            b[0] = Math.floor(((lylim[0] - ((lylim[0] - ylim[0]) % width)) - ylim[0]) / width);
+            b[1] = Math.ceil(((lylim[1] - ((lylim[1] - ylim[1]) % width)) - ylim[0]) / width);
+            for (j = a[0]; j <= a[1]; j++)
+                for (k = b[0]; k <= b[1]; k++) {
+                    xtarget = xlim[0] + j * width;
+                    ytarget = ylim[0] + k * width;
+                    if (polygons[i].pip(xtarget, ytarget))
+                        A[j][k] = kriging.predict(xtarget,
+                            ytarget,
+                            variogram);
+                }
+        }
+        A.xlim = xlim;
+        A.ylim = ylim;
+        A.zlim = [variogram.t.min(), variogram.t.max()];
+        A.width = width;
+        return A;
+    };
+
+    // Plotting on the DOM
+    kriging.plot = function (canvas, grid, xlim, ylim, colors) {
+        // Clear screen 
+        var ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Starting boundaries
+        var range = [xlim[1] - xlim[0], ylim[1] - ylim[0], grid.zlim[1] - grid.zlim[0]];
+        var i, j, x, y, z;
+        var n = grid.length;
+        var m = grid[0].length;
+        var wx = Math.ceil(grid.width * canvas.width / (xlim[1] - xlim[0]));
+        var wy = Math.ceil(grid.width * canvas.height / (ylim[1] - ylim[0]));
+        for (i = 0; i < n; i++)
+            for (j = 0; j < m; j++) {
+                if (grid[i][j] == undefined) continue;
+                x = canvas.width * (i * grid.width + grid.xlim[0] - xlim[0]) / range[0];
+                y = canvas.height * (1 - (j * grid.width + grid.ylim[0] - ylim[0]) / range[1]);
+                //z = (grid[i][j] - grid.zlim[0]) / range[2];
+                //if (z < 0.0) z = 0.0;
+                //if (z > 1.0) z = 1.0;
+
+                //ctx.fillStyle = colors[Math.floor((colors.length - 1) * z)];
+                ctx.fillStyle = colors[Math.floor(grid[i][j] / 50)];
+                ctx.fillRect(Math.round(x - wx / 2), Math.round(y - wy / 2), wx, wy);
+            }
+
+    };
 
     return kriging;
 }();

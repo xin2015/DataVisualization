@@ -13,5 +13,15 @@ namespace DataVisualization.Web.Controllers
         {
             return View();
         }
+
+        public ActionResult Index2()
+        {
+            return View();
+        }
+
+        public ActionResult Index3()
+        {
+            return View();
+        }
     }
 }

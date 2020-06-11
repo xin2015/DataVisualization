@@ -38,5 +38,10 @@ namespace DataVisualization.Web.Controllers
         {
             return View();
         }
+
+        public ActionResult OpenLayers()
+        {
+            return View();
+        }
     }
 }
