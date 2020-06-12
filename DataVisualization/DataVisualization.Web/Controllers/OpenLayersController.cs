@@ -23,5 +23,22 @@ namespace DataVisualization.Web.Controllers
         {
             return View();
         }
+
+        public ActionResult Test()
+        {
+            return View();
+        }
+
+        #region Samples
+        public ActionResult GeoJson()
+        {
+            return View();
+        }
+
+        public ActionResult CanvasGradientPattern()
+        {
+            return View();
+        }
+        #endregion
     }
 }

@@ -32,7 +32,7 @@ namespace DataVisualization.Web.Controllers
         {
             using (DataCenterServiceClient client = new DataCenterServiceClient())
             {
-                StationHourData[] stationHourData = client.GetStationHourDataListFromLive("normal", "normal!@123");
+                StationHourData[] stationHourData = client.GetStationHourDataListFromHistoryByTime("normal", "normal!@123", new DateTime(2020, 6, 11, 10, 0, 0));
                 return Json(stationHourData, JsonRequestBehavior.AllowGet);
             }
         }

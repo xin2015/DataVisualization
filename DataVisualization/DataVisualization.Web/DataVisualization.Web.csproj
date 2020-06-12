@@ -314,6 +314,10 @@
     <Content Include="Views\Kriging\OpenLayers.cshtml" />
     <Content Include="Views\OpenLayers\Index2.cshtml" />
     <Content Include="Views\OpenLayers\Index3.cshtml" />
+    <Content Include="Views\OpenLayers\GeoJson.cshtml" />
+    <Content Include="Views\OpenLayers\CanvasGradientPattern.cshtml" />
+    <Content Include="Views\OpenLayers\Test.cshtml" />
+    <Content Include="Views\Kriging\ContourAndCanvas.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

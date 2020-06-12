@@ -8,7 +8,6 @@ namespace DataVisualization.Web.Controllers
 {
     public class KrigingController : Controller
     {
-        // GET: Kriging
         public ActionResult Index()
         {
             return View();
@@ -43,5 +42,12 @@ namespace DataVisualization.Web.Controllers
         {
             return View();
         }
+
+        #region Samples
+        public ActionResult ContourAndCanvas()
+        {
+            return View();
+        }
+        #endregion
     }
 }

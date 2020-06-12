@@ -102,11 +102,11 @@
         $.ajax({
             url: "/Home/GetStationHourData",
             success: function (a, b, c) {
-                var lnga = 135, lngi = 74, lata = 54, lati = 18;
-                for (var i = lngi; i < lnga; i += 1) {
-                    for (var j = lati; j < lata; j += 1) {
-                        var lngi = i + 1;
-                        var latj = j + 1;
+                var lnga = 135, lngi = 74, lata = 54, lati = 18, m = 0.5;
+                for (var i = lngi; i < lnga; i += m) {
+                    for (var j = lati; j < lata; j += m) {
+                        var lngi = i + m;
+                        var latj = j + m;
                         var count = 0, lngm = 0, latm = 0, valuem = 0;
                         for (var k in a) {
                             var item = a[k];
@@ -160,19 +160,19 @@
                                 if (point[0] >= loni && point[0] <= lona && point[1] >= lati && point[1] <= lata) {
                                     var z = kriging.predict(point[0], point[1], variogram);
                                     // 按AQI渐变
-                                    for (var k = 1, l = 0; k < gradient.length; l = k++) {
-                                        if (z <= gradient[k].value) {
-                                            var t = (gradient[k].value - z) / (gradient[k].value - gradient[l].value);
-                                            r = gradient[k].r - Math.round(t * (gradient[k].r - gradient[l].r));
-                                            g = gradient[k].g - Math.round(t * (gradient[k].g - gradient[l].g));
-                                            b = gradient[k].b - Math.round(t * (gradient[k].b - gradient[l].b));
-                                            break;
-                                        }
-                                    }
-                                    ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
+                                    //for (var k = 1, l = 0; k < gradient.length; l = k++) {
+                                    //    if (z <= gradient[k].value) {
+                                    //        var t = (gradient[k].value - z) / (gradient[k].value - gradient[l].value);
+                                    //        r = gradient[k].r - Math.round(t * (gradient[k].r - gradient[l].r));
+                                    //        g = gradient[k].g - Math.round(t * (gradient[k].g - gradient[l].g));
+                                    //        b = gradient[k].b - Math.round(t * (gradient[k].b - gradient[l].b));
+                                    //        break;
+                                    //    }
+                                    //}
+                                    //ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
 
                                     // 按等级
-                                    //ctx.fillStyle = params.colors[Math.floor(z / 50)];
+                                    ctx.fillStyle = params.colors[Math.floor(z / 50)];
 
                                     ctx.fillRect(x - m, y - m, w, w);
                                 }

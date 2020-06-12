@@ -1,156 +1,147 @@
-﻿
-@{
-    ViewBag.Title = "Index";
+﻿@{
+    Layout = null;
 }
 
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
-    <title>克里金等值面展示示例</title>
+    <title>ContourAndCanvas</title>
     <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
     <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
-    <script src="../dist/kriging-contour.js"></script>
     <style>
-        #map {
-            height: 100%;
+        body, html {
             width: 100%;
+            height: 100%;
+            margin: 0;
+            font-family: "Microsoft YaHei"
+        }
+
+        .map {
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
 <body>
-    <button onclick="showKrigingVector()">克里金矢量(Vector)</button>
-    <button onclick="showKrigingImage()">克里金图像(Image)</button>
     <div id="map" class="map"></div>
-    <script>let params={
-			mapCenter:[118, 32],
-			maxValue:100,
-			krigingModel:'exponential',//'exponential','gaussian','spherical'
-			krigingSigma2:0,
-			krigingAlpha:100,
-			canvasAlpha:0.9,
-			colors:["#006837", "#1a9850", "#66bd63", "#a6d96a", "#d9ef8b", "#ffffbf","#fee08b",
-			"#fdae61", "#f46d43", "#d73027", "#a50026"]
-		};
-		//osm底图
-		let baseLayer = new ol.layer.Tile({
-			source: new ol.source.OSM()
-		});
-
-		//测试点图层
-		var ptlayer=new ol.layer.Vector({
-			source: new ol.source.Vector(),
-			zIndex:4
-		});
-		//生成测试数据
-		let dataset = {
-			"type" : "FeatureCollection",
-			"features" : []
-		};
-		for (let i = 0; i < 100; i++) {
-			let feature={
-				"type" : "Feature",
-				"properties" : {
-					"level" : Math.random()*100
-				},
-				"geometry" : {
-					"type" : "Point",
-					"coordinates" : [params.mapCenter[0]+Math.random()*0.1-.05,params.mapCenter[1]+Math.random()*0.1-.05]
-				}
-			};
-			dataset.features.push(feature);
-		}
-		var format=new ol.format.GeoJSON();
-		ptlayer.getSource().addFeatures(format.readFeatures(dataset));
-
-		let map = new ol.Map({
-			target: 'map',
-			layers: [baseLayer,ptlayer],
-			view: new ol.View({
-				center: params.mapCenter,
-				projection: 'EPSG:4326',
-				zoom: 16
-			})
-		});
-
-		//克里金矢量等值面
-		let krigingVectorSource=new ol.source.Vector();
-		let krigingVectorLayer=new ol.layer.Vector({
-			source:krigingVectorSource,
-			zIndex:3,
-			style:function(feature,res){
-				//获取等值面分级的权重值
-				let _value=feature.get('contour_value');
-				//根据权重值，计算所在颜色渲染的区间
-				let level=parseInt(_value)/10;
-				let color=params.colors[level];
-
-				let style=new ol.style.Style({
-					fill: new ol.style.Fill({
-						color: color
-					}),
-					stroke:new ol.style.Stroke({
-						color: color,
-						width:3
-					})
-				})
-				return [style];
-			}
-		});
-		map.addLayer(krigingVectorLayer);
-
-		//克里金栅格等值面
-		let krigingCanvasLayer=new ol.layer.Image({
-			zIndex:2
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script src="~/Scripts/kriging/kriging.contour.js"></script>
+    <script>
+        let params = {
+            mapCenter: [104.2, 37.8],
+            extent: [73.3, 17.5, 135.1, 53.7],
+            krigingModel: 'exponential',//'exponential','gaussian','spherical'
+            krigingSigma2: 0,
+            krigingAlpha: 100,
+            canvasAlpha: 0.8,
+            colors: ["#00E400", "#FFFF00", "#FF7E00", "#FF0000", "#99004C", "#7E0023"]
+        };
+        params.extent = [ol.proj.fromLonLat([73.3, 17.5])[0], ol.proj.fromLonLat([73.3, 17.5])[1], ol.proj.fromLonLat([135.1, 53.7])[0], ol.proj.fromLonLat([135.1, 53.7])[1]];
+        //osm底图
+        let baseLayer = new ol.layer.Tile({
+            source: new ol.source.OSM()
         });
-        //向map添加图层
-        map.addLayer(krigingCanvasLayer);
+        let map = new ol.Map({
+            target: 'map',
+            layers: [baseLayer],
+            view: new ol.View({
+                center: ol.proj.fromLonLat(params.mapCenter),
+                //center: params.mapCenter,
+                //projection: 'EPSG:4326',
+                zoom: 5
+            })
+        });
+        //克里金矢量等值面
+        let krigingVectorSource = new ol.source.Vector();
+        let krigingVectorLayer = new ol.layer.Vector({
+            source: krigingVectorSource,
+            style: function (feature, res) {
+                //获取等值面分级的权重值
+                let _value = feature.get('contour_value');
+                //根据权重值，计算所在颜色渲染的区间
+                let level = parseInt(_value) / 50;
+                if (level >= params.colors.length) {
+                    level = params.colors.length - 1;
+                }
+                let color = params.colors[level];
+
+                let style = new ol.style.Style({
+                    fill: new ol.style.Fill({
+                        color: color
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: color,
+                        width: 2
+                    })
+                });
+                return style;
+            },
+            opacity: params.canvasAlpha
+        });
+        map.addLayer(krigingVectorLayer);
+        var format = new ol.format.GeoJSON();
+        //生成测试数据
+        let dataset = {
+            "type": "FeatureCollection",
+            "features": []
+        };
+
+        $.ajax({
+            url: "/Home/GetStationHourData",
+            success: function (a, b, c) {
+                var lnga = 136, lngi = 73, lata = 54, lati = 17, m = 0.5;
+                for (var i = lngi; i < lnga; i += m) {
+                    for (var j = lati; j < lata; j += m) {
+                        var lngi = i + m;
+                        var latj = j + m;
+                        var lngm = 0, latm = 0, valuem = 0;
+                        for (var k in a) {
+                            var item = a[k];
+                            if (item.AQI != "—") {
+                                var longitude = item.Longitude - 0;
+                                var latitude = item.Latitude - 0;
+                                var value = item.AQI - 0;
+                                if (value > valuem && longitude >= i && longitude < lngi && latitude >= j && latitude < latj) {
+                                    lngm = longitude;
+                                    latm = latitude;
+                                    valuem = value;
+                                }
+                            }
+                        }
+                        if (valuem > 0) {
+                            let feature = {
+                                "type": "Feature",
+                                "properties": {
+                                    "level": valuem
+                                },
+                                "geometry": {
+                                    "type": "Point",
+                                    //"coordinates": [lngm, latm]
+                                    "coordinates": ol.proj.fromLonLat([lngm, latm])
+                                }
+                            };
+                            dataset.features.push(feature);
+                        }
+                    }
+                }
+                showKrigingVector();
+            }
+        });
 
 
+        //生成矢量等值面并渲染
+        function showKrigingVector() {
+            //生成克里金矢量等值面
+            let kriging_contours = kriging.getVectorContour2(dataset, 'level', {
+                model: 'exponential',
+                sigma2: 0,
+                alpha: 100
+            }, [0, 50, 100, 150, 200, 300], params.extent);//map.getView().calculateExtent(map.getSize())
 
-		//生成矢量等值面并渲染
-		function showKrigingVector(){
-			krigingCanvasLayer.setVisible(false);
-			krigingVectorSource.clear();
-			krigingVectorLayer.setVisible(true);
-
-
-			//生成克里金矢量等值面
-			let kriging_contours=kriging.getVectorContour(dataset,'level',{
-				model:'exponential',
-				sigma2:0,
-				alpha:100
-			},[0,10,20,30,40,50,60,70,80,90,100]);
-
-			let features=format.readFeatures(kriging_contours);
-			krigingVectorSource.addFeatures(features);
-		}
-		function showKrigingImage(){
-			krigingVectorLayer.setVisible(false);
-
-			let imageSource=new ol.source.ImageCanvas({
-                canvasFunction:(extent, resolution, pixelRatio, size, projection) =>{
-                    let canvas = document.createElement('canvas');
-                    canvas.width = size[0];
-                    canvas.height = size[1];
-                    canvas.style.display='block';
-                    //设置canvas透明度
-                    canvas.getContext('2d').globalAlpha=params.canvasAlpha;
-
-                    //使用分层设色渲染
-					kriging.drawCanvasContour(dataset,'level',{
-						model:'exponential',
-						sigma2:0,
-						alpha:100
-					},canvas,[extent[0],extent[2]],[extent[1],extent[3]],params.colors);
-
-                    return canvas;
-                },
-                projection: 'EPSG:4326'
-			});
-
-			krigingCanvasLayer.setSource(imageSource);
-			krigingCanvasLayer.setVisible(true);
-		}</script>
+            let features = format.readFeatures(kriging_contours);
+            krigingVectorSource.addFeatures(features);
+        }
+    </script>
 </body>
 </html>
