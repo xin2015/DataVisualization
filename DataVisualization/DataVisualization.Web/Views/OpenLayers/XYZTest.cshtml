@@ -1,0 +1,163 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="OpenLayers" />
+    <title>WMSImage</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+    <style type="text/css">
+        body, html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            font-family: "Microsoft YaHei"
+        }
+
+        .map {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map" class="map"></div>
+    <script src="~/Scripts/kriging/kriging.js"></script>
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript">
+        var params = {
+            mapCenter: [104.2, 37.8],
+            zoom: 5,
+            krigingModel: 'exponential',//'exponential','gaussian','spherical'
+            krigingSigma2: 0,
+            krigingAlpha: 100,
+            canvasAlpha: 0.8,//canvas图层透明度
+            colors: ["#00E400", "#FFFF00", "#FF7E00", "#FF0000", "#99004C", "#7E0023"]
+        };
+        var projection4326 = ol.proj.get('EPSG:4326');
+        var source;
+        var map = new ol.Map({
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                }),
+                //new ol.layer.Tile({
+                //    //source: new ol.source.XYZ({
+                //    //    projection: projection4326,
+                //    //    tileUrlFunction: function (tileCoord, ratio, projection) {
+                //    //        return "https://services.arcgisonline.com/arcgis/rest/services/ESRI_Imagery_World_2D/MapServer/tile/{z}/{y}/{x}".replace('{z}', (tileCoord[0] - 1).toString())
+                //    //            .replace('{x}', tileCoord[1].toString())
+                //    //            .replace('{y}', (-tileCoord[2] - 1).toString());
+                //    //    }
+                //    //}),
+                //    //source: new ol.source.XYZ({
+                //    //    tileUrlFunction: function (tileCoord, ratio, projection) {
+                //    //        return "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png".replace('{z}', tileCoord[0].toString())
+                //    //            .replace('{x}', tileCoord[1].toString())
+                //    //            .replace('{y}', (-tileCoord[2] - 1).toString());
+                //    //    }
+                //    //}),
+                //    source: source,
+                //    opacity: 0.5
+                //})
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([104.2, 37.8]),
+                zoom: 5
+            })
+        });
+        var data = [];
+        $.ajax({
+            url: "/Home/GetStationHourData",
+            success: function (a, b, c) {
+                var lnga = 135, lngi = 74, lata = 54, lati = 18;
+                for (var i = lngi; i < lnga; i += 1) {
+                    for (var j = lati; j < lata; j += 1) {
+                        var lngi = i + 1;
+                        var latj = j + 1;
+                        var count = 0, lngm = 0, latm = 0, valuem = 0;
+                        for (var k in a) {
+                            var item = a[k];
+                            if (item.AQI != "—") {
+                                var longitude = item.Longitude - 0;
+                                var latitude = item.Latitude - 0;
+                                var value = item.AQI - 0;
+                                if (longitude >= i && longitude < lngi && latitude >= j && latitude < latj) {
+                                    count++;
+                                    lngm += longitude;
+                                    latm += latitude;
+                                    valuem += value;
+                                }
+                            }
+                        }
+                        if (count > 0) {
+                            data.push([lngm / count, latm / count, valuem / count]);
+                        }
+                    }
+                }
+
+                //for (var i = 0; i < a.length; i++) {
+                //    var item = a[i];
+                //    if (item.AQI != "—") {
+                //        var longitude = item.Longitude - 0;
+                //        var latitude = item.Latitude - 0;
+                //        var value = item.AQI - 0;
+                //        data.push([longitude, latitude, value]);
+                //    }
+                //}
+                var lngs = [], lats = [], values = [];
+                for (var i = 0; i < data.length; i++) {
+                    lngs.push(data[i][0]);
+                    lats.push(data[i][1]);
+                    values.push(data[i][2]);
+                }
+                console.time("train");
+                var variogram = kriging.train(values, lngs, lats, params.krigingModel, params.krigingSigma2, params.krigingAlpha);
+                console.timeEnd("train");
+
+                source = new ol.source.XYZ({
+                    projection: projection4326,
+                    tileUrlFunction: function (tileCoord, pixelRatio, projection) {
+                        var canvas = document.createElement('canvas');
+                        canvas.width = 256;
+                        canvas.height = 256;
+                        var ctx = canvas.getContext("2d");
+                        ctx.globalAlpha = 0.5;
+                        ctx.fillStyle = '#00EE00';
+                        ctx.fillRect(0, 0, 256, 256);
+
+                        var tileGrid = source.getTileGrid();
+                        var resolution = tileGrid.getResolution(tileCoord[0]);
+                        var extent = tileGrid.getTileCoordExtent(tileCoord);
+
+                        var w = 3, m = 1;
+                        for (var x = m; x < 256; x += w) {
+                            for (var y = m; y < 256; y += w) {
+                                var lon = extent[0] + resolution * x;
+                                var lat = extent[3] - resolution * y;
+                                var z = kriging.predict(lon, lat, variogram);
+                                // 按等级
+                                ctx.fillStyle = params.colors[Math.floor(z / 50)];
+
+                                ctx.fillRect(x - m, y - m, w, w);
+                            }
+                        }
+
+                        return canvas.toDataURL();
+                    }
+                });
+                var layer = new ol.layer.Tile({
+                    source: source,
+                    map: map,
+                    opacity: 0.5
+                })
+            }
+        });
+    </script>
+</body>
+</html>

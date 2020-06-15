@@ -39,6 +39,28 @@ namespace DataVisualization.Web.Controllers
         {
             return View();
         }
+
+        public ActionResult CanvasTiles()
+        {
+            return View();
+        }
+
+        public ActionResult WMSImage()
+        {
+            return View();
+        }
+        #endregion
+
+        #region Test
+        public ActionResult WMSImageTest()
+        {
+            return View();
+        }
+
+        public ActionResult XYZTest()
+        {
+            return View();
+        }
         #endregion
     }
 }

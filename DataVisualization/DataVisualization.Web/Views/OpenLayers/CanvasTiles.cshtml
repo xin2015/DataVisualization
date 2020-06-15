@@ -1,0 +1,57 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="OpenLayers" />
+    <title>CanvasTiles</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+    <style type="text/css">
+        body, html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            font-family: "Microsoft YaHei"
+        }
+
+        .map {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map" class="map"></div>
+    <script type="text/javascript">
+        var osmSource = new ol.source.OSM();
+        var map = new ol.Map({
+            layers: [
+                new ol.layer.Tile({
+                    source: osmSource
+                }),
+                new ol.layer.Tile({
+                    source: new ol.source.TileDebug({
+                        projection: 'EPSG:3857',
+                        tileGrid: osmSource.getTileGrid()
+                    })
+                })
+            ],
+            target: 'map',
+            controls: ol.control.defaults({
+                attributionOptions: {
+                    collapsible: false
+                }
+            }),
+            view: new ol.View({
+                center: ol.proj.transform(
+                    [-0.1275, 51.507222], 'EPSG:4326', 'EPSG:3857'),
+                zoom: 10
+            })
+        });
+    </script>
+</body>
+</html>

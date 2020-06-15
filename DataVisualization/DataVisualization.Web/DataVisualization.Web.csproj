@@ -318,6 +318,10 @@
     <Content Include="Views\OpenLayers\CanvasGradientPattern.cshtml" />
     <Content Include="Views\OpenLayers\Test.cshtml" />
     <Content Include="Views\Kriging\ContourAndCanvas.cshtml" />
+    <Content Include="Views\OpenLayers\CanvasTiles.cshtml" />
+    <Content Include="Views\OpenLayers\WMSImage.cshtml" />
+    <Content Include="Views\OpenLayers\WMSImageTest.cshtml" />
+    <Content Include="Views\OpenLayers\XYZTest.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

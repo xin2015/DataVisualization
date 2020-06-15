@@ -1,0 +1,54 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="OpenLayers" />
+    <title>WMSImage</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+    <style type="text/css">
+        body, html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            font-family: "Microsoft YaHei"
+        }
+
+        .map {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="map" class="map"></div>
+    <script type="text/javascript">
+        var layers = [
+            new ol.layer.Tile({
+                source: new ol.source.OSM()
+            }),
+            new ol.layer.Image({
+                extent: [-13884991, 2870341, -7455066, 6338219],
+                source: new ol.source.ImageWMS({
+                    url: 'https://ahocevar.com/geoserver/wms',
+                    params: { 'LAYERS': 'topp:states' },
+                    ratio: 1,
+                    serverType: 'geoserver'
+                })
+            })
+        ];
+        var map = new ol.Map({
+            layers: layers,
+            target: 'map',
+            view: new ol.View({
+                center: [-10997148, 4569099],
+                zoom: 4
+            })
+        });
+    </script>
+</body>
+</html>
