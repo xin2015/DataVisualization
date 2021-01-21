@@ -62,5 +62,17 @@ namespace DataVisualization.Web.Controllers
             return View();
         }
         #endregion
+
+        #region Demo
+        public ActionResult Demo()
+        {
+            return View();
+        }
+
+        public ActionResult Demo1()
+        {
+            return View();
+        }
+        #endregion
     }
 }

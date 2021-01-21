@@ -322,6 +322,8 @@
     <Content Include="Views\OpenLayers\WMSImage.cshtml" />
     <Content Include="Views\OpenLayers\WMSImageTest.cshtml" />
     <Content Include="Views\OpenLayers\XYZTest.cshtml" />
+    <Content Include="Views\OpenLayers\Demo.cshtml" />
+    <Content Include="Views\OpenLayers\Demo1.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

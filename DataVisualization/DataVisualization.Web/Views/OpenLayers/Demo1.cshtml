@@ -1,0 +1,311 @@
+﻿@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <title>Demo1</title>
+    <style type="text/css">
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        .map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .compass {
+            position: absolute;
+            z-index: 5;
+            right: .5em;
+            top: .5em;
+            width: 52px;
+            height: 54px;
+            background: rgba(0, 0, 0, 0) url("https://webmap0.bdimg.com/image/api/earth-navi-control-pc4.png") no-repeat 0% 0% / 266px;
+        }
+
+            .compass > button {
+                border: none;
+            }
+
+        .counterclockwise {
+            position: absolute;
+            background: rgba(0, 0, 0, 0) url("https://webmap0.bdimg.com/image/api/earth-navi-control-pc4.png") no-repeat -75px -5px / 266px;
+            left: 2px;
+            top: 5px;
+            z-index: 1;
+            width: 15px;
+            height: 42px;
+            opacity: 1;
+        }
+
+            .counterclockwise:hover {
+                cursor: pointer;
+                background: rgba(0, 0, 0, 0) url("https://webmap0.bdimg.com/image/api/earth-navi-control-pc4.png") no-repeat -89px -5px / 266px;
+            }
+
+        .restore {
+            position: absolute;
+            background: rgba(0, 0, 0, 0) url("https://webmap0.bdimg.com/image/api/earth-navi-control-pc4.png") no-repeat -56px -4px / 266px;
+            left: 19px;
+            top: 4px;
+            width: 14px;
+            height: 44px;
+            transform: rotate(0deg);
+            opacity: 1;
+            cursor: pointer;
+        }
+
+        .rotation0 {
+            transform: rotate(0deg);
+        }
+
+        .rotation90 {
+            transform: rotate(90deg);
+        }
+
+        .rotation180 {
+            transform: rotate(180deg);
+        }
+
+        .rotation270 {
+            transform: rotate(270deg);
+        }
+
+        .clockwise {
+            position: absolute;
+            background: rgba(0, 0, 0, 0) url("https://webmap0.bdimg.com/image/api/earth-navi-control-pc4.png") no-repeat -75px -5px / 266px;
+            right: 2px;
+            top: 5px;
+            z-index: 1;
+            width: 15px;
+            height: 42px;
+            transform: scaleX(-1);
+            opacity: 1;
+        }
+
+            .clockwise:hover {
+                cursor: pointer;
+                background: rgba(0, 0, 0, 0) url("https://webmap0.bdimg.com/image/api/earth-navi-control-pc4.png") no-repeat -89px -5px / 266px;
+            }
+
+        .visualMap {
+            right: .5em;
+            bottom: .5em;
+            position:absolute;
+        }
+    </style>
+</head>
+<body>
+    <div id="mapDiv" class="map"></div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+    <script type="text/javascript">
+var mapCenter = ol.proj.fromLonLat([104.113106, 37.570693]);  // 100000
+        var mapZoom = 5;  // 100000
+        var mapProjection = ol.proj.get('EPSG:3857'); // 投影坐标系
+        var mapProjectionExtent = mapProjection.getExtent(); // 投影坐标系范围
+        var mapProjectionSize = ol.extent.getWidth(mapProjectionExtent) / 256;
+        var mapMinZoom = 1, mapMaxZoom = 19;
+        var mapResolutions = [];
+        for (var i = 0; i <= mapMaxZoom; i++) {
+            mapResolutions[i] = mapProjectionSize / Math.pow(2, i);
+        }
+        var wrapX = true;
+        var colors = [{
+            r: 128,
+            g: 214,
+            b: 0
+        }, {
+            r: 0,
+            g: 228,
+            b: 0
+        }, {
+            r: 255,
+            g: 255,
+            b: 0
+        }, {
+            r: 255,
+            g: 126,
+            b: 0
+        }, {
+            r: 255,
+            g: 0,
+            b: 0
+        }, {
+            r: 153,
+            g: 0,
+            b: 76
+        }, {
+            r: 126,
+            g: 0,
+            b: 35
+        }, {
+            r: 108,
+            g: 0,
+            b: 8
+        }];
+        //var levels = [0, 50, 100, 150, 200, 300, 500];
+        var levels = [0, 5, 10, 15, 20, 25, 30];
+        var unit = 'm/s';
+        function getColorString(color) {
+            return 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+        }
+        var vecSource = new ol.source.TileImage({
+            projection: mapProjection,
+            tileGrid: new ol.tilegrid.TileGrid({
+                extent: mapProjectionExtent,
+                minZoom: mapMinZoom,
+                origin: ol.extent.getTopLeft(mapProjectionExtent),
+                resolutions: mapResolutions,
+                tileSize: [256, 256]
+            }),
+            url: 'http://t{0-7}.tianditu.gov.cn/vec_w/wmts?tk=fdcab2d88e293c189daf038cd01592e6&layer=vec&style=default&tilematrixset=w&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&TileMatrix={z}&TileCol={x}&TileRow={y}',
+            wrapX: wrapX
+        });
+        var vecLayer = new ol.layer.Tile({
+            source: vecSource
+        });
+        var cvaSource = new ol.source.TileImage({
+            projection: mapProjection,
+            tileGrid: new ol.tilegrid.TileGrid({
+                extent: mapProjectionExtent,
+                minZoom: mapMinZoom,
+                origin: ol.extent.getTopLeft(mapProjectionExtent),
+                resolutions: mapResolutions,
+                tileSize: [256, 256]
+            }),
+            url: 'http://t{0-7}.tianditu.gov.cn/cva_w/wmts?tk=fdcab2d88e293c189daf038cd01592e6&layer=cva&style=default&tilematrixset=w&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&TileMatrix={z}&TileCol={x}&TileRow={y}',
+            wrapX: wrapX
+        });
+        var cvaLayer = new ol.layer.Tile({
+            source: cvaSource
+        });
+        var compassControl = function (opt_options) {
+            var options = opt_options || {};
+            var rotation = 0;
+            var counterclockwise = document.createElement('button');
+            counterclockwise.setAttribute('title', '逆时针转动');
+            counterclockwise.className = 'counterclockwise';
+            var restore = document.createElement('button');
+            restore.setAttribute('title', '恢复正北方向');
+            restore.className = 'restore rotation' + rotation;
+            var clockwise = document.createElement('button');
+            clockwise.setAttribute('title', '顺时针转动');
+            clockwise.className = 'clockwise';
+            var this_ = this;
+            var counterclockwiseFunc = function () {
+                rotation -= 90;
+                if (rotation < 0) {
+                    rotation += 360;
+                }
+                this_.getMap().getView().setRotation(rotation / 180 * Math.PI);
+                restore.className = 'restore rotation' + rotation;
+            }
+            counterclockwise.addEventListener('click', counterclockwiseFunc, false);
+            var restoreFunc = function () {
+                rotation = 0;
+                this_.getMap().getView().setRotation(rotation / 180 * Math.PI);
+                restore.className = 'restore rotation' + rotation;
+            }
+            restore.addEventListener('click', restoreFunc, false);
+            var clockwiseFunc = function () {
+                rotation += 90;
+                if (rotation >= 360) {
+                    rotation -= 360;
+                }
+                this_.getMap().getView().setRotation(rotation / 180 * Math.PI);
+                restore.className = 'restore rotation' + rotation;
+            }
+            clockwise.addEventListener('click', clockwiseFunc, false);
+            var element = document.createElement('div');
+            element.className = 'compass';
+            element.appendChild(counterclockwise);
+            element.appendChild(restore);
+            element.appendChild(clockwise);
+
+            ol.control.Control.call(this, {
+                element: element,
+                target: options.target
+            });
+        };
+        ol.inherits(compassControl, ol.control.Control);
+        var visualMapControl = function (opt_options) {
+            var options = opt_options || {};
+            var canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = colors.length * 50;
+            canvas.style.display = 'block';
+            var ctx = canvas.getContext('2d');
+            ctx.font = '16px arial,sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            var startY = 75, endY = colors.length * 50 - 25;
+            ctx.fillStyle = getColorString(colors[0]);
+            ctx.fillRect(0, 0, 64, startY);
+            if (options.isGradient) {
+                var grd = ctx.createLinearGradient(0, startY, 0, endY);
+                //var length = levels[levels.length - 1] - levels[0];
+                //stops = [];
+                //stops.push(0);
+                //for (var i = 1; i < levels.length; i++) {
+                //    stops.push(((levels[i] + levels[i - 1]) / 2 - levels[0]) / length);
+                //}
+                //stops.push(1);
+                stops = [0, 0.083, 0.25, 0.417, 0.583, 0.75, 0.917, 1];
+                for (var i = 0; i < colors.length; i++) {
+                    grd.addColorStop(stops[i], getColorString(colors[i]));
+                }
+                ctx.fillStyle = grd;
+                ctx.fillRect(0, startY, 64, endY - startY);
+            } else {
+                for (var i = 1; i < levels.length; i++) {
+                    ctx.fillStyle = getColorString(colors[i]);
+                    ctx.fillRect(0, startY + (i - 1) * 50, 64, 50);
+                }
+            }
+            ctx.fillStyle = getColorString(colors[colors.length - 1]);
+            ctx.fillRect(0, colors.length * 50 - 25, 64, 25);
+            ctx.fillStyle = 'white';
+            ctx.fillText(unit, 32, 25);
+            for (var i = 0; i < levels.length; i++) {
+                ctx.fillText(levels[i], 32, i * 50 + 75);
+            }
+            var element = document.createElement('div');
+            element.className = 'visualMap';
+            element.appendChild(canvas);
+            ol.control.Control.call(this, {
+                element: element,
+                target: options.target
+            });
+        }
+        ol.inherits(visualMapControl, ol.control.Control);
+        var map = new ol.Map({
+            layers: [vecLayer, cvaLayer],
+            target: 'mapDiv',
+            controls: ol.control.defaults({
+                attribution: false,
+                rotate: true,
+                zoomOptions: {
+                    zoomInTipLabel: '放大',
+                    zoomOutTipLabel: '缩小'
+                }
+            }).extend([new compassControl(), new visualMapControl({ isGradient: true })]),
+            view: new ol.View({
+                center: mapCenter,
+                zoom: mapZoom,
+                minZoom: mapMinZoom,
+                maxZoom: mapMaxZoom
+            })
+        });
+    </script>
+</body>
+
+</html>
