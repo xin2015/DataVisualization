@@ -32,7 +32,16 @@ namespace DataVisualization.Web.Controllers
         {
             using (DataCenterServiceClient client = new DataCenterServiceClient())
             {
-                StationHourData[] stationHourData = client.GetStationHourDataListFromHistoryByTime("normal", "normal!@123", new DateTime(2020, 6, 11, 10, 0, 0));
+                StationHourData[] stationHourData = client.GetStationHourDataListFromHistoryByTime("Suncere9999", "NULL4%tuNC3dO2fQ", DateTime.Today);
+                return Json(stationHourData, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public ActionResult GetStationHourDataByTime(DateTime time)
+        {
+            using (DataCenterServiceClient client = new DataCenterServiceClient())
+            {
+                StationHourData[] stationHourData = client.GetStationHourDataListFromHistoryByTime("Suncere9999", "NULL4%tuNC3dO2fQ", time);
                 return Json(stationHourData, JsonRequestBehavior.AllowGet);
             }
         }

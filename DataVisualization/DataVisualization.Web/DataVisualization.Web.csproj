@@ -128,6 +128,7 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="Controllers\EChartsController.cs" />
+    <Compile Include="Controllers\GISController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\KrigingController.cs" />
     <Compile Include="Controllers\OpenLayersController.cs" />
@@ -159,6 +160,8 @@
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\images\airqualityofchina.png" />
+    <Content Include="Content\images\btn-next-lit.png" />
+    <Content Include="Content\images\btn-pre-lit.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -220,6 +223,10 @@
     <None Include="Connected Services\DataCenterService\DataCenterService2.xsd">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Scripts\data\100000_geo.json" />
+    <Content Include="Scripts\data\450000_geo.json" />
+    <Content Include="Scripts\data\100000.json" />
+    <Content Include="Scripts\data\450000.json" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\echarts\echarts.js" />
     <Content Include="Scripts\echarts\echarts.min.js" />
@@ -324,6 +331,9 @@
     <Content Include="Views\OpenLayers\XYZTest.cshtml" />
     <Content Include="Views\OpenLayers\Demo.cshtml" />
     <Content Include="Views\OpenLayers\Demo1.cshtml" />
+    <Content Include="Views\GIS\Index.cshtml" />
+    <Content Include="Views\GIS\GIS.cshtml" />
+    <Content Include="Views\GIS\GIS2.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

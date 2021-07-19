@@ -1,0 +1,1152 @@
+﻿@{
+    Layout = null;
+}
+
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <title>GIS GIS</title>
+    <style type="text/css">
+        body {
+            font-size: 14px;
+        }
+
+        .map {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 244px;
+            bottom: 0;
+        }
+
+        .visualMap {
+            right: .5em;
+            bottom: .5em;
+            position: absolute;
+        }
+
+        .right-side {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            width: 244px;
+            font-size: 12px;
+            background-color: #fff;
+            box-shadow: -1px 0 10px rgba(0, 0, 0, .2);
+        }
+
+            .right-side h5 {
+                clear: both;
+                margin: 0;
+                padding: 8px 10px;
+                font-size: 14px;
+                font-weight: bold;
+                border-top: 1px solid #ddd;
+                border-bottom: 1px solid #ddd;
+                background-color: #f1f1f1;
+            }
+
+            .right-side label {
+                margin: 0;
+                margin-right: 10px;
+                min-width: 90px;
+                cursor: pointer;
+            }
+
+                .right-side label:nth-child(2n) {
+                    margin: 0;
+                }
+
+            .right-side input[type=checkbox],
+            .right-side input[type=radio] {
+                vertical-align: middle;
+                margin-right: 5px;
+            }
+
+        .dateDiv {
+            vertical-align: middle;
+            padding-bottom: 8px;
+        }
+
+        .choose {
+            padding: 10px 8px;
+        }
+
+            .choose:after {
+                clear: both;
+                display: table;
+                content: '';
+                overflow: hidden;
+                height: 0;
+            }
+
+        .btnPre,
+        .btnNext {
+            width: 32px;
+            height: 32px;
+            float: left;
+            border: 1px solid #ddd;
+            border-right: 0;
+            border-radius: 3px 0 0 3px;
+            background: url(/Content/images/btn-pre-lit.png) no-repeat 12px center #f1f1f1;
+        }
+
+        .btnNext {
+            border: 1px solid #ddd;
+            border-left: 0;
+            border-radius: 0 3px 3px 0;
+            background: #f1f1f1 url(/Content/images/btn-next-lit.png) no-repeat 12px center;
+        }
+
+        .dateTime {
+            vertical-align: middle;
+            width: 70%;
+            padding: 0 10px;
+            float: left;
+            height: 32px;
+            line-height: 32px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div id="mapDiv" class="map"></div>
+    <div class="right-side">
+        <h5>时间</h5>
+        <div class="dateDiv choose">
+            <i class="btnPre btn " id="btnPre"></i>
+            <input type="text" class="dateTime" id="time" name="time" />
+            <i class="btnNext btn" id="btnNext"></i>
+        </div>
+        <h5>时间分辨率</h5>
+        <div class="choose">
+            <label>
+                <input type="radio" name="timeResolution" value="hourly" checked="checked" />小时
+            </label>
+            <label>
+                <input type="radio" name="timeResolution" value="daily" />日均
+            </label>
+            <label>
+                <input type="radio" name="timeResolution" value="monthly" />月
+            </label>
+            <label>
+                <input type="radio" name="timeResolution" value="quarterly" />季
+            </label>
+            <label>
+                <input type="radio" name="timeResolution" value="yearly" />年
+            </label>
+        </div>
+        <h5>地区</h5>
+        <div class="choose">
+            <label>
+                <input type="radio" name="areaCode" value="100000" checked="checked" />全国
+            </label>
+            <label>
+                <input type="radio" name="areaCode" value="450000" />广西
+            </label>
+        </div>
+        <h5>参数</h5>
+        <div class="choose">
+            <label>
+                <input type="radio" name="renderItem" value="AQI" checked="checked" />AQI
+            </label>
+            <label>
+                <input type="radio" name="renderItem" value="SO2" />SO2
+            </label>
+            <label>
+                <input type="radio" name="renderItem" value="NO2" />NO2
+            </label>
+            <label>
+                <input type="radio" name="renderItem" value="CO" />CO
+            </label>
+            <label>
+                <input type="radio" name="renderItem" value="O3" />O3
+            </label>
+            <label>
+                <input type="radio" name="renderItem" value="PM10" />PM10
+            </label>
+            <label>
+                <input type="radio" name="renderItem" value="PM25" />PM2.5
+            </label>
+            <label>
+                <input type="radio" name="renderItem" value="Rain" />降水
+            </label>
+            <label>
+                <input type="radio" name="renderItem" value="Temperature" />气温
+            </label>
+            <label>
+                <input type="radio" name="renderItem" value="Humidity" />湿度
+            </label>
+            <label>
+                <input type="radio" name="renderItem" value="Pressure" />气压
+            </label>
+            <label>
+                <input type="radio" name="renderItem" value="U" />风U分量
+            </label>
+            <label>
+                <input type="radio" name="renderItem" value="V" />风V分量
+            </label>
+        </div>
+        <h5>风场</h5>
+        <div class=" choose">
+            <label>
+                <input type="radio" name="windStatus" value="1" checked="checked" />显示
+            </label>
+            <label>
+                <input type="radio" name="windStatus" value="0" />隐藏
+            </label>
+        </div>
+        <h5>等压线</h5>
+        <div class=" choose">
+            <label>
+                <input type="radio" name="pressureStatus" value="1" />显示
+            </label>
+            <label>
+                <input type="radio" name="pressureStatus" value="0" checked="checked" />隐藏
+            </label>
+        </div>
+        <h5>地图底图</h5>
+        <div class="choose">
+            <label>
+                <input type="radio" name="mapStatus" value="1" checked="checked" />显示
+            </label>
+
+            <label>
+                <input type="radio" name="mapStatus" value="0" />隐藏
+            </label>
+        </div>
+        <h5>裁剪</h5>
+        <div class=" choose">
+            <label>
+                <input type="radio" name="clipStatus" value="1" />开启
+            </label>
+            <label>
+                <input type="radio" name="clipStatus" value="0" checked="checked" />关闭
+            </label>
+        </div>
+        <h5>渲染方式</h5>
+        <div class=" choose">
+            <label>
+                <input type="radio" name="isGradient" value="0" checked="checked" />等级
+            </label>
+            <label>
+                <input type="radio" name="isGradient" value="1" />渐变
+            </label>
+        </div>
+        <h5>行政区划</h5>
+        <div class=" choose">
+            <label>
+                <input type="radio" name="polylineStatus" value="1" checked="checked" />显示
+            </label>
+            <label>
+                <input type="radio" name="polylineStatus" value="0" />隐藏
+            </label>
+        </div>
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+    <script src="https://d3js.org/d3-contour.v2.js"></script>
+    <script src="http://www.my97.net/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript">
+        Date.prototype.format = function (format) {
+            var o = {
+                "M+": this.getMonth() + 1, //month
+                "d+": this.getDate(),    //day
+                "H+": this.getHours(),   //hour
+                "m+": this.getMinutes(), //minute
+                "s+": this.getSeconds(), //second
+                "q+": Math.floor((this.getMonth() + 3) / 3),  //quarter
+                "S": this.getMilliseconds() //millisecond
+            }
+            if (/(y+)/.test(format)) format = format.replace(RegExp.$1,
+                (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            for (var k in o) if (new RegExp("(" + k + ")").test(format))
+                format = format.replace(RegExp.$1,
+                    RegExp.$1.length == 1 ? o[k] :
+                        ("00" + o[k]).substr(("" + o[k]).length));
+            return format;
+        };
+
+        (function (global, factory) {
+            typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+                typeof define === 'function' && define.amd ? define(['exports'], factory) :
+                    (global = global || self, factory(global.rat = global.rat || {}));
+        }(this, (function (exports) {
+            'use strict';
+
+            // Based on https://github.com/oeo4b/kriging.js/blob/master/kriging.js
+            function idw() {
+                var X, Y, T;
+                var n;
+
+                var idw = {};
+
+                idw.train = function (t, x, y) {
+                    T = t;
+                    X = x;
+                    Y = y;
+                    n = t.length;
+                    return idw;
+                };
+
+                // Model prediction
+                idw.predict = function (x, y) {
+                    for (var i = 0; i < n; i++) {
+                        if (X[i] == x && Y[i] == y) {
+                            return T[i];
+                        }
+                    }
+                    var asum = 0, sum = 0;
+                    var xi, yi, a;
+                    for (var i = 0; i < n; i++) {
+                        xi = X[i] - x;
+                        yi = Y[i] - y;
+                        a = 1 / (xi * xi + yi * yi);
+                        asum += a;
+                        sum += a * T[i];
+                    }
+                    return sum / asum;
+                };
+
+                return idw;
+            }
+
+            exports.idw = idw;
+
+            Object.defineProperty(exports, '__esModule', { value: true });
+
+        })));
+    </script>
+    <script type="text/javascript">
+        var time = new Date(new Date().format("yyyy/MM/dd"));
+        var timeResolution = $("input[name='timeResolution']:checked").val();
+        var areaCode = $("input[name='areaCode']:checked").val();
+        var renderItem = $("input[name='renderItem']:checked").val();
+        var windStatus = $("input[name='windStatus']:checked").val() == 1;
+        var pressureStatus = $("input[name='pressureStatus']:checked").val() == 1;
+        var mapStatus = $("input[name='mapStatus']:checked").val() == 1;
+        var clipStatus = $("input[name='clipStatus']:checked").val() == 1;
+        var isGradient = $("input[name='isGradient']:checked").val() == 1;
+        var polylineStatus = $("input[name='polylineStatus']:checked").val() == 1;
+        var mapCenterDic = {
+            "100000": ol.proj.fromLonLat([104.113106, 37.570693]),
+            "450000": ol.proj.fromLonLat([108.794261, 23.833605])
+        };
+        var mapCenter = mapCenterDic[areaCode];
+        var mapZoomDic = {
+            "100000": 5,
+            "450000": 8
+        }
+        var mapZoom = mapZoomDic[areaCode];
+        var mapProjection = ol.proj.get('EPSG:3857'); // 投影坐标系
+        var mapProjectionExtent = mapProjection.getExtent(); // 投影坐标系范围
+        var mapProjectionSize = ol.extent.getWidth(mapProjectionExtent) / 256;
+        var mapMinZoom = 1, mapMaxZoom = 18;
+        var mapResolutions = [];
+        for (var i = 0; i <= mapMaxZoom; i++) {
+            mapResolutions[i] = mapProjectionSize / Math.pow(2, i);
+        }
+        var wrapX = true;
+        var colors = [{
+            r: 128,
+            g: 214,
+            b: 0
+        }, {
+            r: 0,
+            g: 228,
+            b: 0
+        }, {
+            r: 255,
+            g: 255,
+            b: 0
+        }, {
+            r: 255,
+            g: 126,
+            b: 0
+        }, {
+            r: 255,
+            g: 0,
+            b: 0
+        }, {
+            r: 153,
+            g: 0,
+            b: 76
+        }, {
+            r: 126,
+            g: 0,
+            b: 35
+        }, {
+            r: 108,
+            g: 0,
+            b: 8
+        }];
+        var levelsDic = {
+            "hourly": {
+                "AQI": [0, 50, 100, 150, 200, 300, 500],
+                "SO2": [0, 150, 500, 650, 800],
+                "NO2": [0, 100, 200, 700, 1200, 2340, 3840],
+                "CO": [0, 5, 10, 35, 60, 90, 150],
+                "O3": [0, 160, 200, 300, 400, 800, 1200],
+                "PM10": [0, 50, 150, 250, 350, 420, 600],
+                "PM25": [0, 35, 75, 115, 150, 250, 500],
+                "Rain": [0, 2, 4, 6, 8, 10, 20],
+                "Temperature": [-40, -20, -10, 0, 10, 20, 40],
+                "Humidity": [0, 40, 60, 70, 80, 90, 100],
+                "Pressure": [500, 700, 900, 950, 1000, 1050, 1100],
+                "WindDirection": [0, 60, 120, 180, 240, 300, 360],
+                "WindSpeed": [0, 5, 10, 15, 20, 25, 30],
+                "U": [-30, -20, -10, 0, 10, 20, 30],
+                "V": [-30, -20, -10, 0, 10, 20, 30]
+            },
+            "daily": {
+                "AQI": [0, 50, 100, 150, 200, 300, 500],
+                "SO2": [0, 50, 150, 475, 800, 1600, 2620],
+                "NO2": [0, 40, 80, 180, 280, 565, 940],
+                "CO": [0, 2, 4, 14, 24, 36, 60],
+                "O3": [0, 100, 160, 215, 265, 800],
+                "PM10": [0, 50, 150, 250, 350, 420, 600],
+                "PM25": [0, 35, 75, 115, 150, 250, 500],
+                "Rain": [0, 2, 4, 6, 8, 10, 20],
+                "Temperature": [-40, -20, -10, 0, 10, 20, 40],
+                "Humidity": [0, 40, 60, 70, 80, 90, 100],
+                "Pressure": [500, 700, 900, 950, 1000, 1050, 1100],
+                "WindDirection": [0, 60, 120, 180, 240, 300, 360],
+                "WindSpeed": [0, 5, 10, 15, 20, 25, 30],
+                "U": [-30, -20, -10, 0, 10, 20, 30],
+                "V": [-30, -20, -10, 0, 10, 20, 30]
+            },
+            "monthly": {
+                "AQI": [0, 3, 4, 5, 6, 7, 8],
+                "SO2": [0, 50, 150, 475, 800, 1600, 2620],
+                "NO2": [0, 40, 80, 180, 280, 565, 940],
+                "CO": [0, 2, 4, 14, 24, 36, 60],
+                "O3": [0, 100, 160, 215, 265, 800],
+                "PM10": [0, 50, 150, 250, 350, 420, 600],
+                "PM25": [0, 35, 75, 115, 150, 250, 500],
+                "Rain": [0, 5, 10, 25, 50, 100, 250],
+                "Temperature": [-40, -20, -10, 0, 10, 20, 40],
+                "Humidity": [0, 40, 60, 70, 80, 90, 100],
+                "Pressure": [500, 700, 900, 950, 1000, 1050, 1100],
+                "WindDirection": [0, 60, 120, 180, 240, 300, 360],
+                "WindSpeed": [0, 5, 10, 15, 20, 25, 30],
+                "U": [-30, -20, -10, 0, 10, 20, 30],
+                "V": [-30, -20, -10, 0, 10, 20, 30]
+            },
+            "quarterly": {
+                "AQI": [0, 3, 4, 5, 6, 7, 8],
+                "SO2": [0, 50, 150, 475, 800, 1600, 2620],
+                "NO2": [0, 40, 80, 180, 280, 565, 940],
+                "CO": [0, 2, 4, 14, 24, 36, 60],
+                "O3": [0, 100, 160, 215, 265, 800],
+                "PM10": [0, 50, 150, 250, 350, 420, 600],
+                "PM25": [0, 35, 75, 115, 150, 250, 500],
+                "Rain": [0, 10, 50, 100, 200, 300, 500],
+                "Temperature": [-40, -20, -10, 0, 10, 20, 40],
+                "Humidity": [0, 40, 60, 70, 80, 90, 100],
+                "Pressure": [500, 700, 900, 950, 1000, 1050, 1100],
+                "WindDirection": [0, 60, 120, 180, 240, 300, 360],
+                "WindSpeed": [0, 5, 10, 15, 20, 25, 30],
+                "U": [-30, -20, -10, 0, 10, 20, 30],
+                "V": [-30, -20, -10, 0, 10, 20, 30]
+            },
+            "yearly": {
+                "AQI": [0, 3, 4, 5, 6, 7, 8],
+                //"AQI": [0, 2, 3, 4, 5, 6, 8],
+                "SO2": [0, 50, 150, 475, 800, 1600, 2620],
+                "NO2": [0, 40, 80, 180, 280, 565, 940],
+                "CO": [0, 2, 4, 14, 24, 36, 60],
+                "O3": [0, 100, 160, 215, 265, 800],
+                "PM10": [0, 50, 150, 250, 350, 420, 600],
+                "PM25": [0, 35, 75, 115, 150, 250, 500],
+                "Rain": [0, 10, 50, 100, 200, 300, 500],
+                "Temperature": [-40, -20, -10, 0, 10, 20, 40],
+                "Humidity": [0, 40, 60, 70, 80, 90, 100],
+                "Pressure": [500, 700, 900, 950, 1000, 1050, 1100],
+                "WindDirection": [0, 60, 120, 180, 240, 300, 360],
+                "WindSpeed": [0, 5, 10, 15, 20, 25, 30],
+                "U": [-30, -20, -10, 0, 10, 20, 30],
+                "V": [-30, -20, -10, 0, 10, 20, 30]
+            }
+        };
+        var levels = levelsDic[timeResolution][renderItem];
+        var gradients;
+        var getColorFunc = getLevelColor;
+        function getLevelColor(lt) {
+            var r, g, b;
+            for (var k = 1; k < levels.length; k++) {
+                if (lt <= levels[k]) {
+                    r = colors[k].r;
+                    g = colors[k].g;
+                    b = colors[k].b;
+                    break;
+                }
+            }
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }
+        function getGradientColor(lt) {
+            var r, g, b;
+            for (var k = 1, l = 0; k < gradients.length; l = k++) {
+                if (lt <= gradients[k]) {
+                    var p = (lt - gradients[l]) / (gradients[k] - gradients[l]);
+                    r = colors[l].r + Math.round(p * (colors[k].r - colors[l].r));
+                    g = colors[l].g + Math.round(p * (colors[k].g - colors[l].g));
+                    b = colors[l].b + Math.round(p * (colors[k].b - colors[l].b));
+                    break;
+                }
+            }
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }
+        function setGradients() {
+            gradients = [];
+            gradients.push(levels[0]);
+            for (var i = 1; i < levels.length; i++) {
+                gradients.push((levels[i - 1] + levels[i]) / 2);
+            }
+            gradients.push(levels[levels.length - 1]);
+            getColorFunc = getGradientColor;
+        }
+        var unitDic = {
+            "AQI": 'AQI',
+            "SO2": 'μg/m³',
+            "NO2": 'μg/m³',
+            "CO": 'mg/m³',
+            "O3": 'μg/m³',
+            "PM10": 'μg/m³',
+            "PM25": 'μg/m³',
+            "Rain": 'mm',
+            "Temperature": '℃',
+            "Humidity": '%',
+            "Pressure": 'hPa',
+            "WindDirection": '°',
+            "WindSpeed": 'm/s',
+            "U": 'm/s',
+            "V": 'm/s'
+        };
+        var unit = unitDic[renderItem];
+        function getColorString(color) {
+            return 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+        }
+        var gridExtentDic = {
+            "100000": [54, 12, 156, 59],
+            "450000": [102, 19, 115, 28]
+        };
+        var gridExtent = gridExtentDic[areaCode];
+        var gridResolutionDic = {
+            "100000": 0.25,
+            "450000": 0.05
+        };
+        var gridResolution = gridResolutionDic[areaCode];
+        var gridRowLength = (gridExtent[3] - gridExtent[1]) / gridResolution + 1, gridColLength = (gridExtent[2] - gridExtent[0]) / gridResolution + 1;
+        var values = [], pressureValues = [], windUData = [], windVData = [];
+        var contours = [], contours2 = [];
+        var path;
+        var clipDic = {
+            "100000": {},
+            "450000": {}
+        };
+        var clipData = {};
+        $.getJSON("/Scripts/data/100000.json", function (result) {
+            clipDic["100000"] = result;
+            clipData = result;
+        });
+        $.getJSON("/Scripts/data/450000.json", function (result) {
+            clipDic["450000"] = result;
+        });
+        var vecSource = new ol.source.TileImage({
+            projection: mapProjection,
+            tileGrid: new ol.tilegrid.TileGrid({
+                extent: mapProjectionExtent,
+                minZoom: mapMinZoom,
+                origin: ol.extent.getTopLeft(mapProjectionExtent),
+                resolutions: mapResolutions,
+                tileSize: [256, 256]
+            }),
+            url: 'http://t{0-7}.tianditu.gov.cn/vec_w/wmts?tk=fdcab2d88e293c189daf038cd01592e6&layer=vec&style=default&tilematrixset=w&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&TileMatrix={z}&TileCol={x}&TileRow={y}',
+            wrapX: wrapX
+        });
+        var vecLayer = new ol.layer.Tile({
+            source: vecSource
+        });
+        //var cvaSource = new ol.source.TileImage({
+        //    projection: mapProjection,
+        //    tileGrid: new ol.tilegrid.TileGrid({
+        //        extent: mapProjectionExtent,
+        //        minZoom: mapMinZoom,
+        //        origin: ol.extent.getTopLeft(mapProjectionExtent),
+        //        resolutions: mapResolutions,
+        //        tileSize: [256, 256]
+        //    }),
+        //    url: 'http://t{0-7}.tianditu.gov.cn/cva_w/wmts?tk=fdcab2d88e293c189daf038cd01592e6&layer=cva&style=default&tilematrixset=w&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&TileMatrix={z}&TileCol={x}&TileRow={y}',
+        //    wrapX: wrapX
+        //});
+        //var cvaLayer = new ol.layer.Tile({
+        //    source: cvaSource
+        //});
+        var renderSource = new ol.source.ImageCanvas({
+            canvasFunction: (extent, resolution, pixelRatio, size, projection) => {
+                var canvas = document.createElement('canvas');
+                canvas.width = Math.round(size[0]);
+                canvas.height = Math.round(size[1]);
+                var ctx = canvas.getContext("2d");
+                ctx.scale(pixelRatio, pixelRatio);
+                if (values.length != 0) {
+                    for (var i = 0; i < canvas.height; i += 2) {
+                        for (var j = 0; j < canvas.width; j += 2) {
+                            var coordinate = map.getCoordinateFromPixel([j, i]);
+                            var point = ol.proj.toLonLat(coordinate);
+                            if (point[0] >= gridExtent[0] && point[0] <= gridExtent[2] && point[1] >= gridExtent[1] && point[1] <= gridExtent[3]) {
+                                var value = getValue(point[0], point[1]);
+                                ctx.fillStyle = getColorFunc(value);
+                                ctx.fillRect(j, i, 2, 2);
+                            }
+                        }
+                    }
+                    clip(ctx, extent, resolution);
+                }
+                return canvas;
+            },
+            ratio: 1
+        });
+        var renderLayer = new ol.layer.Image({
+            source: renderSource
+        });
+        var contourSource = new ol.source.ImageCanvas({
+            canvasFunction: (extent, resolution, pixelRatio, size, projection) => {
+                var canvas = document.createElement('canvas');
+                canvas.width = Math.round(size[0]);
+                canvas.height = Math.round(size[1]);
+                var ctx = canvas.getContext("2d");
+                ctx.scale(pixelRatio, pixelRatio);
+                ctx.fillStyle = 'rgb(0,72,186)';
+                ctx.strokeStyle = 'rgb(0,72,186)';
+                ctx.font = "20px  Arial";
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                contours.forEach(function (geometry) {
+                    ctx.beginPath();
+                    for (var i = 0; i < geometry.coordinates.length; i++) {
+                        let polygon = geometry.coordinates[i];
+                        for (var j = 0; j < polygon.length; j++) {
+                            var points = polygon[j];
+                            var point = [gridExtent[0] + points[0][0] * gridResolution, gridExtent[3] - points[0][1] * gridResolution];
+                            point = ol.proj.fromLonLat(point);
+                            var pixel = map.getPixelFromCoordinate(point);
+                            ctx.moveTo(pixel[0], pixel[1]);
+                            for (var k = 1; k < points.length; k++) {
+                                point = [gridExtent[0] + points[k][0] * gridResolution, gridExtent[3] - points[k][1] * gridResolution];
+                                point = ol.proj.fromLonLat(point);
+                                pixel = map.getPixelFromCoordinate(point);
+                                ctx.lineTo(pixel[0], pixel[1]);
+                            }
+                        }
+                    }
+                    ctx.stroke();
+                    for (var i = 0; i < geometry.coordinates.length; i++) {
+                        let polygon = geometry.coordinates[i];
+                        for (var j = 0; j < polygon.length; j++) {
+                            var points = polygon[j];
+                            if (points.length < 15) continue;
+                            var textIndex = Math.floor(points.length / 2);
+                            var point = [gridExtent[0] + points[textIndex][0] * gridResolution, gridExtent[3] - points[textIndex][1] * gridResolution];
+                            point = ol.proj.fromLonLat(point);
+                            var pixel = map.getPixelFromCoordinate(point);
+                            ctx.clearRect(pixel[0] - 16, pixel[1] - 10, 32, 20);
+                            ctx.fillText(geometry.value, pixel[0], pixel[1]);
+                        }
+                    }
+                });
+                clip(ctx, extent, resolution);
+                return canvas;
+            },
+            ratio: 1
+        });
+        var contourLayer = new ol.layer.Image({
+            source: contourSource
+        });
+        var windSource = new ol.source.ImageCanvas({
+            canvasFunction: (extent, resolution, pixelRatio, size, projection) => {
+                var canvas = document.createElement('canvas');
+                canvas.width = Math.round(size[0]);
+                canvas.height = Math.round(size[1]);
+                var ctx = canvas.getContext("2d");
+                ctx.scale(pixelRatio, pixelRatio);
+                ctx.lineWidth = 2;
+                if (windUData.length != 0) {
+                    var w = 30, v = 10;
+                    for (var i = 0; i < canvas.height; i += w) {
+                        for (var j = 0; j < canvas.width; j += w) {
+                            var coordinate = map.getCoordinateFromPixel([j, i]);
+                            var point = ol.proj.toLonLat(coordinate);
+                            if (point[0] >= gridExtent[0] && point[0] <= gridExtent[2] && point[1] >= gridExtent[1] && point[1] <= gridExtent[3]) {
+                                var wind = getWind(point[0], point[1]);
+                                ctx.save();
+                                ctx.translate(j, i);
+                                ctx.beginPath();
+                                ctx.moveTo(0, 0);
+                                ctx.translate(wind[0] * v, -wind[1] * v);
+                                ctx.lineTo(0, 0);
+                                ctx.stroke();
+                                ctx.beginPath();
+                                ctx.moveTo(0, 0);
+                                ctx.rotate(Math.atan2(-wind[1], wind[0]));
+                                ctx.lineTo(0, -4);
+                                ctx.lineTo(10, 0);
+                                ctx.lineTo(0, 4);
+                                ctx.fill();
+                                ctx.restore();
+                            }
+                        }
+                    }
+                    clip(ctx, extent, resolution);
+                }
+                return canvas;
+            },
+            ratio: 1
+        });
+        var windLayer = new ol.layer.Image({
+            source: windSource
+        });
+        var polylineStyle = new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: '#000',
+                width: 2
+            }),
+            text: new ol.style.Text({
+                font: '14px arial,sans-serif',
+                fill: new ol.style.Fill({
+                    color: '#000'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#000',
+                    width: 1
+                })
+            })
+        });
+        var polylineUrlDic = {
+            "100000": '/Scripts/data/100000_geo.json',
+            "450000": '/Scripts/data/450000_geo.json'
+        };
+        var polylineSource = new ol.source.Vector({
+            url: function () {
+                return polylineUrlDic[areaCode];
+            },
+            format: new ol.format.GeoJSON()
+        });
+        var polylineLayer = new ol.layer.Vector({
+            source: polylineSource,
+            style: function (feature) {
+                polylineStyle.getText().setText(feature.get('name'));
+                return polylineStyle;
+            }
+        });
+        var visualMapControl = function (opt_options) {
+            var options = opt_options || {};
+            var canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = colors.length * 50;
+            canvas.style.display = 'block';
+            var ctx = canvas.getContext('2d');
+            ctx.font = '16px arial,sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            var startY = 75, endY = colors.length * 50 - 25;
+            ctx.fillStyle = getColorString(colors[0]);
+            ctx.fillRect(0, 0, 64, startY);
+            if (isGradient) {
+                var grd = ctx.createLinearGradient(0, startY, 0, endY);
+                stops = [0, 0.083, 0.25, 0.417, 0.583, 0.75, 0.917, 1];
+                for (var i = 0; i < colors.length; i++) {
+                    grd.addColorStop(stops[i], getColorString(colors[i]));
+                }
+                ctx.fillStyle = grd;
+                ctx.fillRect(0, startY, 64, endY - startY);
+            } else {
+                for (var i = 1; i < colors.length - 1; i++) {
+                    ctx.fillStyle = getColorString(colors[i]);
+                    ctx.fillRect(0, startY + (i - 1) * 50, 64, 50);
+                }
+            }
+            ctx.fillStyle = getColorString(colors[colors.length - 1]);
+            ctx.fillRect(0, colors.length * 50 - 25, 64, 25);
+            ctx.fillStyle = 'white';
+            ctx.fillText(unit, 32, 25);
+            for (var i = 0; i < levels.length; i++) {
+                ctx.fillText(levels[i], 32, i * 50 + 75);
+            }
+            var element = document.createElement('div');
+            element.className = 'visualMap';
+            element.appendChild(canvas);
+            ol.control.Control.call(this, {
+                element: element,
+                target: options.target
+            });
+        }
+        ol.inherits(visualMapControl, ol.control.Control);
+        var visualMap = new visualMapControl();
+        var map = new ol.Map({
+            layers: [vecLayer, renderLayer, contourLayer, windLayer, polylineLayer],
+            target: 'mapDiv',
+            controls: ol.control.defaults({
+                attribution: false,
+                rotate: true,
+                zoomOptions: {
+                    zoomInTipLabel: '放大',
+                    zoomOutTipLabel: '缩小'
+                }
+            }).extend([visualMap]),
+            view: new ol.View({
+                center: mapCenter,
+                zoom: mapZoom,
+                minZoom: mapMinZoom,
+                maxZoom: mapMaxZoom
+            })
+        });
+        // 双线性插值
+        function bilinearInterpolate(x, y, g00, g10, g01, g11) {
+            var rx = (1 - x);
+            var ry = (1 - y);
+            var a = rx * ry,
+                b = x * ry,
+                c = rx * y,
+                d = x * y;
+            return g00 * a + g10 * b + g01 * c + g11 * d;
+        }
+
+        // 插值
+        function getValue(lon, lat) {
+            var xi = (lon - gridExtent[0]) / gridResolution;
+            var yi = (gridExtent[3] - lat) / gridResolution;
+            var xi0 = Math.floor(xi), yi0 = Math.floor(yi);
+            return bilinearInterpolate(xi - xi0, yi - yi0, values[yi0 * gridColLength + xi0], values[yi0 * gridColLength + (xi0 + 1)], values[(yi0 + 1) * gridColLength + xi0], values[(yi0 + 1) * gridColLength + (xi0 + 1)]);
+        }
+
+        function getWind(lon, lat) {
+            var xi = (lon - gridExtent[0]) / gridResolution;
+            var yi = (gridExtent[3] - lat) / gridResolution;
+            var xi0 = Math.floor(xi), yi0 = Math.floor(yi);
+            return [bilinearInterpolate(xi - xi0, yi - yi0, windUData[yi0 * gridColLength + xi0], windUData[yi0 * gridColLength + (xi0 + 1)], windUData[(yi0 + 1) * gridColLength + xi0], windUData[(yi0 + 1) * gridColLength + (xi0 + 1)]), bilinearInterpolate(xi - xi0, yi - yi0, windVData[yi0 * gridColLength + xi0], windVData[yi0 * gridColLength + (xi0 + 1)], windVData[(yi0 + 1) * gridColLength + xi0], windVData[(yi0 + 1) * gridColLength + (xi0 + 1)])];
+        }
+
+        // 保留边界多边形内的部分
+        function clip(ctx, extent, resolution) {
+            if (clipStatus) {
+                ctx.globalCompositeOperation = "destination-in"; //全局合成操作
+                ctx.beginPath();
+                for (var i = 0; i < clipData.features.length; i++) {
+                    var feature = clipData.features[i];
+                    for (var j = 0; j < feature.geometry.coordinates.length; j++) {
+                        var polygon = feature.geometry.coordinates[j];
+                        for (var k = 0; k < polygon.length; k++) {
+                            var points = polygon[k];
+                            var point = ol.proj.fromLonLat(points[0]);
+                            var pixel = [(point[0] - extent[0]) / resolution - 0.5, (extent[3] - point[1]) / resolution - 0.5];
+                            ctx.moveTo(pixel[0], pixel[1]);
+                            for (var l = 1; l < points.length; l++) {
+                                point = ol.proj.fromLonLat(points[l]);
+                                pixel = [(point[0] - extent[0]) / resolution - 0.5, (extent[3] - point[1]) / resolution - 0.5];
+                                ctx.lineTo(pixel[0], pixel[1]);
+                            }
+                        }
+                    }
+                }
+                ctx.fill();
+            }
+        }
+
+        function updateGrid() {
+            gridExtent = gridExtentDic[areaCode];
+            gridResolution = gridResolutionDic[areaCode];
+            gridRowLength = (gridExtent[3] - gridExtent[1]) / gridResolution + 1;
+            gridColLength = (gridExtent[2] - gridExtent[0]) / gridResolution + 1;
+        }
+
+        function render() {
+            $.getJSON("/Home/GetStationHourDataByTime?time=" + time.format("yyyy-MM-dd HH:mm")).done(function (json) {
+                var X = [], Y = [], T = [];
+                for (var i in json) {
+                    var item = json[i];
+                    if (item.AQI != '—') {
+                        X.push(item.Longitude - 0);
+                        Y.push(item.Latitude - 0);
+                        T.push(item.AQI - 0);
+                    }
+                }
+                var idw = rat.idw();
+                idw.train(T, X, Y);
+                values = [];
+                for (var i = 0; i < gridRowLength; i++) {
+                    for (var j = 0; j < gridColLength; j++) {
+                        values.push(idw.predict(gridExtent[0] + j * gridResolution, gridExtent[3] - i * gridResolution));
+                    }
+                }
+                renderSource.refresh();
+            }).fail(function (jqxhr, textStatus, error) {
+                values = [];
+                renderSource.refresh();
+                var err = textStatus + ", " + error;
+                console.log("Request Failed: " + err);
+            });
+        }
+
+        function renderWind() {
+            path = "/WebFiles/" + time.format("yyyyMMdd") + "/1004/" + timeResolution + "/" + (timeResolution == "hourly" ? (time.format("yyyyMMddHH") + "/") : "") + areaCode + "_U.json";
+            $.getJSON(path).done(function (json) {
+                windUData = json;
+            }).fail(function (jqxhr, textStatus, error) {
+                windUData = [];
+                var err = textStatus + ", " + error;
+                console.log("Request Failed: " + err);
+            });
+            path = "/WebFiles/" + time.format("yyyyMMdd") + "/1004/" + timeResolution + "/" + (timeResolution == "hourly" ? (time.format("yyyyMMddHH") + "/") : "") + areaCode + "_V.json";
+            $.getJSON(path).done(function (json) {
+                windVData = json;
+            }).fail(function (jqxhr, textStatus, error) {
+                windVData = [];
+                var err = textStatus + ", " + error;
+                console.log("Request Failed: " + err);
+            });
+            setTimeout(function () {
+                windSource.refresh();
+            }, 1000);
+        }
+
+        function renderPressure() {
+            path = "/WebFiles/" + time.format("yyyyMMdd") + "/1004/" + timeResolution + "/" + (timeResolution == "hourly" ? (time.format("yyyyMMddHH") + "/") : "") + areaCode + "_Pressure.json";
+            $.getJSON(path).done(function (json) {
+                pressureValues = json;
+                contours = d3.contours()
+                    .size([gridColLength, gridRowLength])
+                    .smooth(true)
+                    .thresholds(levelsDic[timeResolution]["Pressure"])(pressureValues);
+                contourSource.refresh();
+            }).fail(function (jqxhr, textStatus, error) {
+                pressureValues = [];
+                contours = [];
+                contourSource.refresh();
+                var err = textStatus + ", " + error;
+                console.log("Request Failed: " + err);
+            });
+        }
+
+        var dateFmt = 'yyyy-MM-dd HH:00';
+        function onpickedFunction() {
+            switch (timeResolution) {
+                case "hourly": {
+                    time = new Date($dp.cal.newdate.y, $dp.cal.newdate.M - 1, $dp.cal.newdate.d, $dp.cal.newdate.H, 0, 0);
+                    break;
+                }
+                case "daily": {
+                    time = new Date($dp.cal.newdate.y, $dp.cal.newdate.M - 1, $dp.cal.newdate.d);
+                    break;
+                }
+                case "monthly": {
+                    time = new Date($dp.cal.newdate.y, ($dp.cal.newdate.M - 1) - ($dp.cal.newdate.M - 1) % 3, 1);
+                    break;
+                }
+                case "quarterly": {
+                    time = new Date($dp.cal.newdate.y, $dp.cal.newdate.M - 1, 1);
+                    break;
+                }
+                case "yearly": {
+                    time = new Date($dp.cal.newdate.y, 0, 1);
+                    break;
+                }
+            }
+            $("#time").val(time.format(dateFmt));
+            render();
+            renderPressure();
+            renderWind();
+        }
+
+        $(document).ready(function () {
+            $("#time").val(time.format(dateFmt));
+            contourLayer.setVisible(pressureStatus);
+            render();
+            renderPressure();
+            renderWind();
+
+            $("#time")[0].onclick = function () { WdatePicker({ isShowClear: false, readOnly: true, onpicked: onpickedFunction, dateFmt: dateFmt }); }
+
+            $("#btnPre").click(function () {
+                switch (timeResolution) {
+                    case "hourly": {
+                        time.setHours(time.getHours() - 1);
+                        break;
+                    }
+                    case "daily": {
+                        time.setDate(time.getDate() - 1);
+                        break;
+                    }
+                    case "monthly": {
+                        time.setMonth(time.getMonth() - 1);
+                        break;
+                    }
+                    case "quarterly": {
+                        time.setMonth(time.getMonth() - 3);
+                        break;
+                    }
+                    case "yearly": {
+                        time.setFullYear(time.getFullYear() - 1);
+                        break;
+                    }
+                }
+                $("#time").val(time.format(dateFmt));
+                render();
+                renderPressure();
+                renderWind();
+            });
+
+            $("#btnNext").click(function () {
+                switch (timeResolution) {
+                    case "hourly": {
+                        time.setHours(time.getHours() + 1);
+                        break;
+                    }
+                    case "daily": {
+                        time.setDate(time.getDate() + 1);
+                        break;
+                    }
+                    case "monthly": {
+                        time.setMonth(time.getMonth() + 1);
+                        break;
+                    }
+                    case "quarterly": {
+                        time.setMonth(time.getMonth() + 3);
+                        break;
+                    }
+                    case "yearly": {
+                        time.setFullYear(time.getFullYear() + 1);
+                        break;
+                    }
+                }
+                $("#time").val(time.format(dateFmt));
+                render();
+                renderPressure();
+                renderWind();
+            });
+
+            $("input[name='timeResolution']").change(function () {
+                timeResolution = $(this).val();
+                levels = levelsDic[timeResolution][renderItem];
+                if (isGradient) {
+                    setGradients();
+                }
+                if (renderItem == "AQI") {
+                    switch (timeResolution) {
+                        case "hourly":
+                        case "daily": {
+                            unit = "AQI";
+                            break;
+                        }
+                        default: {
+                            unit = "综合指数";
+                            break;
+                        }
+                    }
+                }
+                if (timeResolution == "hourly") {
+                    dateFmt = "yyyy-MM-dd HH:00";
+                } else {
+                    dateFmt = "yyyy-MM-dd";
+                }
+                $("#time")[0].onclick = function () { WdatePicker({ isShowClear: false, readOnly: true, onpicked: onpickedFunction, dateFmt: dateFmt }); }
+                onpickedFunction();
+                map.removeControl(visualMap);
+                visualMap = new visualMapControl();
+                map.addControl(visualMap);
+            });
+
+            $("input[name='areaCode']").change(function () {
+                areaCode = $(this).val();
+                mapCenter = mapCenterDic[areaCode];
+                mapZoom = mapZoomDic[areaCode];
+                clipData = clipDic[areaCode];
+                var mapView = map.getView();
+                mapView.setMinZoom(mapZoom - 2);
+                mapView.setMaxZoom(mapZoom + 2);
+                mapView.animate({ zoom: mapZoom }, { center: mapCenter });
+                updateGrid();
+                render();
+                renderPressure();
+                renderWind();
+                polylineSource.clear();
+            });
+
+            $("input[name='renderItem']").change(function () {
+                renderItem = $(this).val();
+                levels = levelsDic[timeResolution][renderItem];
+                if (isGradient) {
+                    setGradients();
+                }
+                unit = unitDic[renderItem];
+                if (renderItem == "AQI") {
+                    switch (timeResolution) {
+                        case "hourly":
+                        case "daily": {
+                            unit = "AQI";
+                            break;
+                        }
+                        default: {
+                            unit = "综合指数";
+                            break;
+                        }
+                    }
+                }
+                render();
+                map.removeControl(visualMap);
+                visualMap = new visualMapControl();
+                map.addControl(visualMap);
+            });
+
+            $("input[name='windStatus']").change(function () {
+                windStatus = $(this).val() == 1;
+                windLayer.setVisible(windStatus);
+            });
+
+            $("input[name='pressureStatus']").change(function () {
+                pressureStatus = $(this).val() == 1;
+                contourLayer.setVisible(pressureStatus);
+            });
+
+            $("input[name='mapStatus']").change(function () {
+                mapStatus = $(this).val() == 1;
+                vecLayer.setVisible(mapStatus);
+            });
+
+            $("input[name='polylineStatus']").change(function () {
+                polylineStatus = $(this).val() == 1;
+                polylineLayer.setVisible(polylineStatus);
+            });
+
+            $("input[name='clipStatus']").change(function () {
+                clipStatus = $(this).val() == 1;
+                render();
+                renderPressure();
+                renderWind();
+            });
+
+            $("input[name='isGradient']").change(function () {
+                isGradient = $(this).val() == 1;
+                if (isGradient) {
+                    setGradients();
+                } else {
+                    getColorFunc = getLevelColor;
+                }
+                render();
+                map.removeControl(visualMap);
+                visualMap = new visualMapControl();
+                map.addControl(visualMap);
+            });
+        });
+    </script>
+</body>
+</html>
