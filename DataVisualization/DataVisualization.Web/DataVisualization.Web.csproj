@@ -133,6 +133,7 @@
     <Compile Include="Controllers\KrigingController.cs" />
     <Compile Include="Controllers\OpenLayersController.cs" />
     <Compile Include="Controllers\WindJSController.cs" />
+    <Compile Include="Controllers\XiZangController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -227,6 +228,36 @@
     <Content Include="Scripts\data\450000_geo.json" />
     <Content Include="Scripts\data\100000.json" />
     <Content Include="Scripts\data\450000.json" />
+    <Content Include="Scripts\data\lat.json" />
+    <Content Include="Scripts\data\lon.json" />
+    <Content Include="Scripts\data\precipation.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_cfrac_100.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_cfrac_200.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_cfrac_500.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_height_100.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_height_200.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_height_500.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_lat.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_lon.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_precipation.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_qs_100.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_qs_200.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_qs_500.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_qvapor_100.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_qvapor_200.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_qvapor_500.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_rh_100.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_rh_200.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_rh_500.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_temperature_100.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_temperature_200.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_temperature_500.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_wdir_100.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_wdir_200.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_wdir_500.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_wspd_100.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_wspd_200.json" />
+    <Content Include="Scripts\data\20210720\20210720000000_wspd_500.json" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\echarts\echarts.js" />
     <Content Include="Scripts\echarts\echarts.min.js" />
@@ -334,6 +365,11 @@
     <Content Include="Views\GIS\Index.cshtml" />
     <Content Include="Views\GIS\GIS.cshtml" />
     <Content Include="Views\GIS\GIS2.cshtml" />
+    <Content Include="Views\GIS\GIS3.cshtml" />
+    <Content Include="Views\XiZang\Index.cshtml" />
+    <Content Include="Views\XiZang\Index2.cshtml" />
+    <Content Include="Views\XiZang\Index3.cshtml" />
+    <Content Include="Views\XiZang\Index4.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

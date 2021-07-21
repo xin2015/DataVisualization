@@ -6,25 +6,25 @@ using System.Web.Mvc;
 
 namespace DataVisualization.Web.Controllers
 {
-    public class GISController : Controller
+    public class XiZangController : Controller
     {
-        // GET: GIS
+        // GET: XiZang
         public ActionResult Index()
         {
             return View();
         }
 
-        public ActionResult GIS()
+        public ActionResult Index2()
         {
             return View();
         }
 
-        public ActionResult GIS2()
+        public ActionResult Index3()
         {
             return View();
         }
 
-        public ActionResult GIS3()
+        public ActionResult Index4()
         {
             return View();
         }

@@ -1,0 +1,503 @@
+﻿@{
+    Layout = null;
+}
+
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <title>GIS GIS</title>
+    <style type="text/css">
+        body {
+            font-size: 14px;
+        }
+
+        .map {
+            position: absolute;
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .visualMap {
+            right: .5em;
+            bottom: .5em;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <div id="mapDiv" class="map"></div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/Turf.js/6.5.0/turf.min.js"></script>
+    <script type="text/javascript">
+        Date.prototype.format = function (format) {
+            var o = {
+                "M+": this.getMonth() + 1, //month
+                "d+": this.getDate(),    //day
+                "H+": this.getHours(),   //hour
+                "m+": this.getMinutes(), //minute
+                "s+": this.getSeconds(), //second
+                "q+": Math.floor((this.getMonth() + 3) / 3),  //quarter
+                "S": this.getMilliseconds() //millisecond
+            }
+            if (/(y+)/.test(format)) format = format.replace(RegExp.$1,
+                (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            for (var k in o) if (new RegExp("(" + k + ")").test(format))
+                format = format.replace(RegExp.$1,
+                    RegExp.$1.length == 1 ? o[k] :
+                        ("00" + o[k]).substr(("" + o[k]).length));
+            return format;
+        };
+
+        (function (global, factory) {
+            typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+                typeof define === 'function' && define.amd ? define(['exports'], factory) :
+                    (global = global || self, factory(global.rat = global.rat || {}));
+        }(this, (function (exports) {
+            'use strict';
+
+            // Based on https://github.com/oeo4b/kriging.js/blob/master/kriging.js
+            function idw() {
+                var X, Y, T;
+                var n;
+
+                var idw = {};
+
+                idw.train = function (t, x, y) {
+                    T = t;
+                    X = x;
+                    Y = y;
+                    n = t.length;
+                    return idw;
+                };
+
+                // Model prediction
+                idw.predict = function (x, y) {
+                    for (var i = 0; i < n; i++) {
+                        if (X[i] == x && Y[i] == y) {
+                            return T[i];
+                        }
+                    }
+                    var asum = 0, sum = 0;
+                    var xi, yi, a;
+                    for (var i = 0; i < n; i++) {
+                        xi = X[i] - x;
+                        yi = Y[i] - y;
+                        a = 1 / (xi * xi + yi * yi);
+                        asum += a;
+                        sum += a * T[i];
+                    }
+                    return sum / asum;
+                };
+
+                return idw;
+            }
+
+            exports.idw = idw;
+
+            Object.defineProperty(exports, '__esModule', { value: true });
+
+        })));
+    </script>
+    <script type="text/javascript">
+        var isGradient = true;
+        var mapCenter = ol.proj.fromLonLat([88.695901, 32.041647]);
+        var mapZoom = 5;
+        var mapProjection = ol.proj.get('EPSG:3857'); // 投影坐标系
+        var mapProjectionExtent = mapProjection.getExtent(); // 投影坐标系范围
+        var mapProjectionSize = ol.extent.getWidth(mapProjectionExtent) / 256;
+        var mapMinZoom = 1, mapMaxZoom = 18;
+        var mapResolutions = [];
+        for (var i = 0; i <= mapMaxZoom; i++) {
+            mapResolutions[i] = mapProjectionSize / Math.pow(2, i);
+        }
+        var wrapX = true;
+        var colors = [{
+            r: 128,
+            g: 214,
+            b: 0
+        }, {
+            r: 0,
+            g: 228,
+            b: 0
+        }, {
+            r: 255,
+            g: 255,
+            b: 0
+        }, {
+            r: 255,
+            g: 126,
+            b: 0
+        }, {
+            r: 255,
+            g: 0,
+            b: 0
+        }, {
+            r: 153,
+            g: 0,
+            b: 76
+        }, {
+            r: 126,
+            g: 0,
+            b: 35
+        }, {
+            r: 108,
+            g: 0,
+            b: 8
+        }];
+        var levels = [-10, -5, -2, 0, 2, 5, 10];
+        var gradients;
+        var getColorFunc = getLevelColor;
+        function getLevelColor(lt) {
+            var r, g, b;
+            for (var k = 1; k < levels.length; k++) {
+                if (lt <= levels[k]) {
+                    r = colors[k].r;
+                    g = colors[k].g;
+                    b = colors[k].b;
+                    break;
+                }
+            }
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }
+        function getGradientColor(lt) {
+            var r, g, b;
+            for (var k = 1, l = 0; k < gradients.length; l = k++) {
+                if (lt <= gradients[k]) {
+                    var p = (lt - gradients[l]) / (gradients[k] - gradients[l]);
+                    r = colors[l].r + Math.round(p * (colors[k].r - colors[l].r));
+                    g = colors[l].g + Math.round(p * (colors[k].g - colors[l].g));
+                    b = colors[l].b + Math.round(p * (colors[k].b - colors[l].b));
+                    break;
+                }
+            }
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }
+        function setGradients() {
+            gradients = [];
+            gradients.push(levels[0]);
+            for (var i = 1; i < levels.length; i++) {
+                gradients.push((levels[i - 1] + levels[i]) / 2);
+            }
+            gradients.push(levels[levels.length - 1]);
+            getColorFunc = getGradientColor;
+        }
+        var unit = '℃';
+        function getColorString(color) {
+            return 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
+        }
+        var temperatureData, lonData, latData;
+        var contours;
+        var vecSource = new ol.source.TileImage({
+            projection: mapProjection,
+            tileGrid: new ol.tilegrid.TileGrid({
+                extent: mapProjectionExtent,
+                minZoom: mapMinZoom,
+                origin: ol.extent.getTopLeft(mapProjectionExtent),
+                resolutions: mapResolutions,
+                tileSize: [256, 256]
+            }),
+            url: 'http://t{0-7}.tianditu.gov.cn/vec_w/wmts?tk=fdcab2d88e293c189daf038cd01592e6&layer=vec&style=default&tilematrixset=w&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&TileMatrix={z}&TileCol={x}&TileRow={y}',
+            wrapX: wrapX
+        });
+        var vecLayer = new ol.layer.Tile({
+            source: vecSource
+        });
+        //var cvaSource = new ol.source.TileImage({
+        //    projection: mapProjection,
+        //    tileGrid: new ol.tilegrid.TileGrid({
+        //        extent: mapProjectionExtent,
+        //        minZoom: mapMinZoom,
+        //        origin: ol.extent.getTopLeft(mapProjectionExtent),
+        //        resolutions: mapResolutions,
+        //        tileSize: [256, 256]
+        //    }),
+        //    url: 'http://t{0-7}.tianditu.gov.cn/cva_w/wmts?tk=fdcab2d88e293c189daf038cd01592e6&layer=cva&style=default&tilematrixset=w&Service=WMTS&Request=GetTile&Version=1.0.0&Format=tiles&TileMatrix={z}&TileCol={x}&TileRow={y}',
+        //    wrapX: wrapX
+        //});
+        //var cvaLayer = new ol.layer.Tile({
+        //    source: cvaSource
+        //});
+        var renderSource = new ol.source.ImageCanvas({
+            canvasFunction: (extent, resolution, pixelRatio, size, projection) => {
+                var canvas = document.createElement('canvas');
+                canvas.width = Math.round(size[0]);
+                canvas.height = Math.round(size[1]);
+                var ctx = canvas.getContext("2d");
+                ctx.scale(pixelRatio, pixelRatio);
+                ctx.globalCompositeOperation = "source-over"; //全局合成操作
+                if (temperatureData && lonData && latData) {
+                    console.time("render");
+                    var contourLevels = levels;
+                    if (isGradient) {
+                        for (; contourLevels.length < 100;) {
+                            var temp = [];
+                            for (var i = 1; i < contourLevels.length; i++) {
+                                temp.push(contourLevels[i - 1]);
+                                temp.push((contourLevels[i - 1] + contourLevels[i]) / 2);
+                            }
+                            temp.push(contourLevels[contourLevels.length - 1]);
+                            contourLevels = temp;
+                        }
+                    }
+                    var turfPoints = [];
+                    for (var i = 0; i < temperatureData.rowCount; i++) {
+                        for (var j = 0; j < temperatureData.colCount; j++) {
+                            turfPoints.push(turf.point([i, j], { temperature: temperatureData.data[i * temperatureData.colCount + j] }));
+                        }
+                    }
+                    //for (var i = 0; i < temperatureData.data.length; i++) {
+                    //    turfPoints[i] = turf.point([lonData.data[i], latData.data[i]], { temperature: temperatureData.data[i] });
+                    //}
+                    var pointGrid = turf.featureCollection(turfPoints);
+
+                    var lines = turf.isolines(pointGrid, contourLevels, { zProperty: 'temperature' });
+                    console.log(lines);
+
+
+                    lines.features.forEach(function (feature) {
+                        var geometry = feature.geometry;
+                        ctx.beginPath();
+                        for (var i = 0; i < geometry.coordinates.length; i++) {
+                            var points = geometry.coordinates[i];
+                            var point = [bilinearInterpolate(points[0][0], points[0][1], lonData.data, lonData.colCount), bilinearInterpolate(points[0][0], points[0][1], latData.data, latData.colCount)];
+                            point = ol.proj.fromLonLat(point);
+                            var pixel = map.getPixelFromCoordinate(point);
+                            ctx.moveTo(pixel[0], pixel[1]);
+                            for (var k = 1; k < points.length; k++) {
+                                point = [bilinearInterpolate(points[k][0], points[k][1], lonData.data, lonData.colCount), bilinearInterpolate(points[k][0], points[k][1], latData.data, latData.colCount)];
+                                point = ol.proj.fromLonLat(point);
+                                pixel = map.getPixelFromCoordinate(point);
+                                ctx.lineTo(pixel[0], pixel[1]);
+                            }
+                        }
+                        ctx.fillStyle = getColorFunc(feature.properties.temperature);
+                        ctx.fill();
+                    })
+                    console.timeEnd("render");
+                }
+                return canvas;
+            },
+            ratio: 1
+        });
+        var renderLayer = new ol.layer.Image({
+            source: renderSource
+        });
+        var polylineStyle = new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: '#000',
+                width: 2
+            }),
+            text: new ol.style.Text({
+                font: '14px arial,sans-serif',
+                fill: new ol.style.Fill({
+                    color: '#000'
+                }),
+                stroke: new ol.style.Stroke({
+                    color: '#000',
+                    width: 1
+                })
+            })
+        });
+        var polylineSource = new ol.source.Vector({
+            url: function () {
+                return '/Scripts/data/100000_geo.json';
+            },
+            format: new ol.format.GeoJSON()
+        });
+        var polylineLayer = new ol.layer.Vector({
+            source: polylineSource,
+            style: function (feature) {
+                polylineStyle.getText().setText(feature.get('name'));
+                return polylineStyle;
+            }
+        });
+        var visualMapControl = function (opt_options) {
+            var options = opt_options || {};
+            var canvas = document.createElement('canvas');
+            canvas.width = 64;
+            canvas.height = colors.length * 50;
+            canvas.style.display = 'block';
+            var ctx = canvas.getContext('2d');
+            ctx.font = '16px arial,sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            var startY = 75, endY = colors.length * 50 - 25;
+            ctx.fillStyle = getColorString(colors[0]);
+            ctx.fillRect(0, 0, 64, startY);
+            if (isGradient) {
+                var grd = ctx.createLinearGradient(0, startY, 0, endY);
+                stops = [0, 0.083, 0.25, 0.417, 0.583, 0.75, 0.917, 1];
+                for (var i = 0; i < colors.length; i++) {
+                    grd.addColorStop(stops[i], getColorString(colors[i]));
+                }
+                ctx.fillStyle = grd;
+                ctx.fillRect(0, startY, 64, endY - startY);
+            } else {
+                for (var i = 1; i < colors.length - 1; i++) {
+                    ctx.fillStyle = getColorString(colors[i]);
+                    ctx.fillRect(0, startY + (i - 1) * 50, 64, 50);
+                }
+            }
+            ctx.fillStyle = getColorString(colors[colors.length - 1]);
+            ctx.fillRect(0, colors.length * 50 - 25, 64, 25);
+            ctx.fillStyle = 'white';
+            ctx.fillText(unit, 32, 25);
+            for (var i = 0; i < levels.length; i++) {
+                ctx.fillText(levels[i], 32, i * 50 + 75);
+            }
+            var element = document.createElement('div');
+            element.className = 'visualMap';
+            element.appendChild(canvas);
+            ol.control.Control.call(this, {
+                element: element,
+                target: options.target
+            });
+        }
+        ol.inherits(visualMapControl, ol.control.Control);
+        var visualMap = new visualMapControl();
+        var map = new ol.Map({
+            layers: [vecLayer, renderLayer, polylineLayer],
+            target: 'mapDiv',
+            controls: ol.control.defaults({
+                attribution: false,
+                rotate: true,
+                zoomOptions: {
+                    zoomInTipLabel: '放大',
+                    zoomOutTipLabel: '缩小'
+                }
+            }).extend([visualMap]),
+            view: new ol.View({
+                center: mapCenter,
+                zoom: mapZoom,
+                minZoom: mapMinZoom,
+                maxZoom: mapMaxZoom
+            })
+        });
+        // 双线性插值
+        function bilinearInterpolate(i, j, data, colCount) {
+            var i0 = Math.floor(i), j0 = Math.floor(j);
+            if (i == i0 && j == j0) {
+                return data[i0 * colCount + j0];
+            }
+            var i1 = i == i0 ? i + 1 : Math.ceil(i);
+            var j1 = j == j0 ? j + 1 : Math.ceil(j);
+            var di0 = i - i0, di1 = i1 - i;
+            var dj0 = j - j0, dj1 = j1 - j;
+            return data[i0 * colCount + j0] * di1 * dj1 + data[i0 * colCount + j1] * di1 * dj0 + data[i1 * colCount + j0] * di0 * dj1 + data[i1 * colCount + j1] * di0 * dj0;
+        }
+
+        var w = 1;
+        function render() {
+            $.getJSON("/Scripts/data/20210720/20210720000000_temperature_500.json").done(function (json) {
+                //var X = [], Y = [], T = [];
+                //for (var i in json) {
+                //    var item = json[i];
+                //    if (item.AQI != '—') {
+                //        X.push(item.Longitude - 0);
+                //        Y.push(item.Latitude - 0);
+                //        T.push(item.AQI - 0);
+                //    }
+                //}
+                //var idw = rat.idw();
+                //idw.train(T, X, Y);
+                temperatureData = json;
+                var t = { colCount: 0, rowCount: 0, data: [] };
+                for (var i = 0; i < temperatureData.rowCount; i += w) {
+                    t.rowCount++;
+                    t.colCount = 0;
+                    for (var j = 0; j < temperatureData.colCount; j += w) {
+                        t.colCount++;
+                        t.data.push(bilinearInterpolate(i, j, temperatureData.data, temperatureData.colCount));
+                    }
+                }
+                temperatureData = t;
+                //var contourLevels = levels;
+                //if (isGradient) {
+                //    for (; contourLevels.length < 100;) {
+                //        var temp = [];
+                //        for (var i = 1; i < contourLevels.length; i++) {
+                //            temp.push(contourLevels[i - 1]);
+                //            temp.push((contourLevels[i - 1] + contourLevels[i]) / 2);
+                //        }
+                //        temp.push(contourLevels[contourLevels.length - 1]);
+                //        contourLevels = temp;
+                //    }
+                //}
+
+                //var extent = [0, 0, temperatureData.colCount / 10, temperatureData.rowCount / 10];
+                //var cellWidth = 0.1;
+                //var pointGrid = turf.pointGrid(extent, cellWidth, { units: 'degrees' });
+                //console.log(pointGrid);
+
+                //for (var i = 0; i < pointGrid.features.length; i++) {
+                //    pointGrid.features[i].properties.temperature = Math.random() * 10;
+                //}
+                //var breaks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+                //var lines = turf.isolines(pointGrid, breaks, { zProperty: 'temperature' });
+                renderSource.refresh();
+            }).fail(function (jqxhr, textStatus, error) {
+                temperatureData = null;
+                contours = null;
+                renderSource.refresh();
+                var err = textStatus + ", " + error;
+                console.log("Request Failed: " + err);
+            });
+        }
+
+        function renderCoordinate() {
+            $.getJSON("/Scripts/data/20210720/20210720000000_lon.json").done(function (json) {
+                lonData = json;
+                var temp = { colCount: 0, rowCount: 0, data: [] };
+                for (var i = 0; i < lonData.rowCount; i += w) {
+                    temp.rowCount++;
+                    temp.colCount = 0;
+                    for (var j = 0; j < lonData.colCount; j += w) {
+                        temp.colCount++;
+                        temp.data.push(bilinearInterpolate(i, j, lonData.data, lonData.colCount));
+                    }
+                }
+                lonData = temp;
+                renderSource.refresh();
+            }).fail(function (jqxhr, textStatus, error) {
+                lonData = null;
+                var err = textStatus + ", " + error;
+                console.log("Request Failed: " + err);
+            });
+            $.getJSON("/Scripts/data/20210720/20210720000000_lat.json").done(function (json) {
+                latData = json;
+                var temp = { colCount: 0, rowCount: 0, data: [] };
+                for (var i = 0; i < latData.rowCount; i += w) {
+                    temp.rowCount++;
+                    temp.colCount = 0;
+                    for (var j = 0; j < latData.colCount; j += w) {
+                        temp.colCount++;
+                        temp.data.push(bilinearInterpolate(i, j, latData.data, latData.colCount));
+                    }
+                }
+                latData = temp;
+                renderSource.refresh();
+            }).fail(function (jqxhr, textStatus, error) {
+                latData = null;
+                var err = textStatus + ", " + error;
+                console.log("Request Failed: " + err);
+            });
+        }
+
+        $(document).ready(function () {
+            renderCoordinate();
+            render();
+            setGradients();
+        });
+    </script>
+</body>
+</html>
