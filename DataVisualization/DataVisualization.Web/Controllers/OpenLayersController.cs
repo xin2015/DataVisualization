@@ -29,6 +29,11 @@ namespace DataVisualization.Web.Controllers
             return View();
         }
 
+        public ActionResult Turf()
+        {
+            return View();
+        }
+
         #region Samples
         public ActionResult GeoJson()
         {

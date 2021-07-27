@@ -153,7 +153,7 @@
             g: 0,
             b: 8
         }];
-        var levels = [-10, -5, -2, 0, 2, 5, 10];
+        var levels = [5, 20, 35, 50, 65, 80, 95];
         var gradients;
         var getColorFunc = getLevelColor;
         function getLevelColor(lt) {
@@ -370,9 +370,9 @@
             return data[i0 * colCount + j0] * di1 * dj1 + data[i0 * colCount + j1] * di1 * dj0 + data[i1 * colCount + j0] * di0 * dj1 + data[i1 * colCount + j1] * di0 * dj0;
         }
 
-        var w = 0.1;
+        var w = 1;
         function render() {
-            $.getJSON("/Scripts/data/20210720/20210720000000_temperature_500.json").done(function (json) {
+            $.getJSON("/Scripts/data/20210720/20210720000000_precipation.json").done(function (json) {
                 //var X = [], Y = [], T = [];
                 //for (var i in json) {
                 //    var item = json[i];
@@ -385,16 +385,6 @@
                 //var idw = rat.idw();
                 //idw.train(T, X, Y);
                 temperatureData = json;
-                var t = { colCount: 0, rowCount: 0, data: [] };
-                for (var i = 0; i < temperatureData.rowCount; i += w) {
-                    t.rowCount++;
-                    t.colCount = 0;
-                    for (var j = 0; j < temperatureData.colCount; j += w) {
-                        t.colCount++;
-                        t.data.push(bilinearInterpolate(i, j, temperatureData.data, temperatureData.colCount));
-                    }
-                }
-                temperatureData = t;
                 var contourLevels = levels;
                 if (isGradient) {
                     for (; contourLevels.length < 100;) {
@@ -412,6 +402,18 @@
                     .smooth(true)
                     .thresholds(contourLevels)(temperatureData.data);
                 console.log(contours);
+                var t = { colCount: 0, rowCount: 0, data: [] };
+                for (var i = 0; i < temperatureData.rowCount; i += w) {
+                    t.rowCount++;
+                    t.colCount = 0;
+                    for (var j = 0; j < temperatureData.colCount; j += w) {
+                        t.colCount++;
+                        t.data.push(bilinearInterpolate(i, j, temperatureData.data, temperatureData.colCount));
+                    }
+                }
+                temperatureData = t;
+                
+                
                 renderSource.refresh();
             }).fail(function (jqxhr, textStatus, error) {
                 temperatureData = null;

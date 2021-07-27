@@ -370,6 +370,7 @@
     <Content Include="Views\XiZang\Index2.cshtml" />
     <Content Include="Views\XiZang\Index3.cshtml" />
     <Content Include="Views\XiZang\Index4.cshtml" />
+    <Content Include="Views\OpenLayers\Turf.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
