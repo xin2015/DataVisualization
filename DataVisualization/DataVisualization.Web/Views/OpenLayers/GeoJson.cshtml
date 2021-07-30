@@ -201,6 +201,25 @@
                 zoom: 2
             })
         });
+
+        var point00 = [78.2, 25.6];
+        var point01 = [99.6, 25.8];
+        var point10 = [76.6, 36.9];
+        var point11 = [100.9, 37.1];
+        var point001 = ol.proj.transform(point00, 'EPSG:4326', 'EPSG:3857');
+        var point011 = ol.proj.transform(point01, 'EPSG:4326', 'EPSG:3857');
+        var point101 = ol.proj.transform(point10, 'EPSG:4326', 'EPSG:3857');
+        var point111 = ol.proj.transform(point11, 'EPSG:4326', 'EPSG:3857');
+        //var point002 = ol.proj.transform(point00, 'EPSG:4326', 'EPSG:2154');
+        //var point012 = ol.proj.transform(point01, 'EPSG:4326', 'EPSG:2154');
+        //var point102 = ol.proj.transform(point10, 'EPSG:4326', 'EPSG:2154');
+        //var point112 = ol.proj.transform(point11, 'EPSG:4326', 'EPSG:2154');
+        var point003 = ol.proj.transform(point00, 'EPSG:4326', 'EPSG:1671');
+        var point013 = ol.proj.transform(point01, 'EPSG:4326', 'EPSG:1671');
+        var point103 = ol.proj.transform(point10, 'EPSG:4326', 'EPSG:1671');
+        var point113 = ol.proj.transform(point11, 'EPSG:4326', 'EPSG:1671');
+
+        console.log(point00);
     </script>
 </body>
 </html>

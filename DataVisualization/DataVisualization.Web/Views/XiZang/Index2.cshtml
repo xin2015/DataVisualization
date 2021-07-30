@@ -153,7 +153,7 @@
             g: 0,
             b: 8
         }];
-        var levels = [5, 20, 35, 50, 65, 80, 95];
+        var levels = [-10, -5, -2, 0, 2, 5, 10];
         var gradients;
         var getColorFunc = getLevelColor;
         function getLevelColor(lt) {
@@ -242,12 +242,22 @@
                             var polygon = geometry.coordinates[i];
                             for (var j = 0; j < polygon.length; j++) {
                                 var points = polygon[j];
-                                var point = [bilinearInterpolate(points[0][1], points[0][0], lonData.data, lonData.colCount), bilinearInterpolate(points[0][1], points[0][0], latData.data, latData.colCount)];
+                                var point = [points[0][0] - 0.5, points[0][1] - 0.5];
+                                if (point[0] < 0) point[0] = 0;
+                                if (point[1] < 0) point[1] = 0;
+                                if (point[0] > lonData.colCount - 1) point[0] = lonData.colCount - 1;
+                                if (point[1] > lonData.rowCount - 1) point[1] = lonData.rowCount - 1;
+                                point = [bilinearInterpolate(point[1], point[0], lonData.data, lonData.colCount), bilinearInterpolate(point[1], point[0], latData.data, latData.colCount)];
                                 point = ol.proj.fromLonLat(point);
                                 var pixel = map.getPixelFromCoordinate(point);
                                 ctx.moveTo(pixel[0], pixel[1]);
                                 for (var k = 1; k < points.length; k++) {
-                                    point = [bilinearInterpolate(points[k][1], points[k][0], lonData.data, lonData.colCount), bilinearInterpolate(points[k][1], points[k][0], latData.data, latData.colCount)];
+                                    point = [points[k][0] - 0.5, points[k][1] - 0.5];
+                                    if (point[0] < 0) point[0] = 0;
+                                    if (point[1] < 0) point[1] = 0;
+                                    if (point[0] > lonData.colCount - 1) point[0] = lonData.colCount - 1;
+                                    if (point[1] > lonData.rowCount - 1) point[1] = lonData.rowCount - 1;
+                                    point = [bilinearInterpolate(point[1], point[0], lonData.data, lonData.colCount), bilinearInterpolate(point[1], point[0], latData.data, latData.colCount)];
                                     point = ol.proj.fromLonLat(point);
                                     pixel = map.getPixelFromCoordinate(point);
                                     ctx.lineTo(pixel[0], pixel[1]);
@@ -372,7 +382,7 @@
 
         var w = 1;
         function render() {
-            $.getJSON("/Scripts/data/20210720/20210720000000_precipation.json").done(function (json) {
+            $.getJSON("/Scripts/data/20210720/20210720000000_temperature_500.json").done(function (json) {
                 //var X = [], Y = [], T = [];
                 //for (var i in json) {
                 //    var item = json[i];
@@ -412,8 +422,8 @@
                     }
                 }
                 temperatureData = t;
-                
-                
+
+
                 renderSource.refresh();
             }).fail(function (jqxhr, textStatus, error) {
                 temperatureData = null;
