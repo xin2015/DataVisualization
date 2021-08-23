@@ -110,8 +110,8 @@
     <script type="text/javascript">
         var isGradient = true;
         var polylineStatus = true;
-        var mapCenter = ol.proj.fromLonLat([88.695901, 32.041647]);
-        var mapZoom = 5;
+        var mapCenter = ol.proj.fromLonLat([101.03, 19.55]);
+        var mapZoom = 7;
         var mapProjection = ol.proj.get('EPSG:3857'); // 投影坐标系
         var mapProjectionExtent = mapProjection.getExtent(); // 投影坐标系范围
         var mapProjectionSize = ol.extent.getWidth(mapProjectionExtent) / 256;
@@ -154,7 +154,7 @@
             g: 0,
             b: 8
         }];
-        var levels = [-10, 0, 10, 20, 30, 40, 50];
+        var levels = [-13, -11, -9, -7, -5, -3, -1];
         var gradients;
         var getColorFunc = getLevelColor;
         function getLevelColor(lt) {
@@ -180,7 +180,10 @@
                     break;
                 }
             }
-            return 'rgb(' + r + ',' + g + ',' + b + ')';
+            if (r) {
+                return 'rgb(' + r + ',' + g + ',' + b + ')';
+            }
+            return 'rgba(0,0,0,0)';
         }
         function setGradients() {
             gradients = [];
@@ -236,8 +239,8 @@
                 if (temperatureData && lonData && latData) {
                     console.time("render");
                     var zoom = map.getView().getZoom();
-                    var indexResolution = Math.pow(2, mapZoom - zoom) * 0.1;
-                    //var indexResolution = 1;
+                    //var indexResolution = Math.pow(2, mapZoom - zoom) * 0.2;
+                    var indexResolution = 1;
                     var pixelStatus = [canvas.width * canvas.height];
                     var iMax = temperatureData.rowCount - 1, jMax = temperatureData.colCount - 1;
                     for (var i = 0; i <= iMax; i += indexResolution) {
@@ -400,8 +403,72 @@
         }
 
         $(document).ready(function () {
-            renderCoordinate();
-            render();
+            $.getJSON("/Scripts/data/LPDM_100200_1km_so2_daily_20210813.json").done(function (json) {
+                var loni = 180, lona = 0, lati = 90, lata = 0, valuei = 9999, valuea = -9999;
+                for (var i = 0; i < json.length; i++) {
+                    var item = json[i];
+                    if (item.lon > lona) {
+                        lona = item.lon;
+                    }
+                    if (item.lon < loni) {
+                        loni = item.lon;
+                    }
+                    if (item.lat > lata) {
+                        lata = item.lat;
+                    }
+                    if (item.lat < lati) {
+                        lati = item.lat;
+                    }
+                    if (item.TOT > valuea) {
+                        valuea = item.TOT;
+                    }
+                    if (item.TOT < valuei) {
+                        valuei = item.TOT;
+                    }
+                }
+                lati = Math.round(lati * 10) / 10;
+                var colCount = Math.round((lona - loni) / 0.1 + 1), rowCount = Math.round((lata - lati) / 0.1 + 1);
+                temperatureData = {
+                    colCount: colCount,
+                    rowCount: rowCount,
+                    data: []
+                };
+                lonData = {
+                    colCount: temperatureData.colCount,
+                    rowCount: temperatureData.rowCount,
+                    data: []
+                };
+                latData = {
+                    colCount: temperatureData.colCount,
+                    rowCount: temperatureData.rowCount,
+                    data: []
+                };
+                for (var i = 0, k = 0; i < rowCount; i++) {
+                    var lat = lati + i * 0.1;
+                    for (var j = 0; j < colCount; j++, k++) {
+                        var lon = loni + j * 0.1;
+                        lonData.data[k] = lon;
+                        latData.data[k] = lat;
+                        var value = NaN;
+                        for (var l = 0; l < json.length; l++) {
+                            var item = json[l];
+                            if (item.lon == lon && item.lat == lat) {
+                                value = item.TOT;
+                                break;
+                            }
+                        }
+                        temperatureData.data[k] = value;
+                    }
+                }
+                renderSource.refresh();
+            }).fail(function (jqxhr, textStatus, error) {
+                temperatureData = null;
+                renderSource.refresh();
+                var err = textStatus + ", " + error;
+                console.log("Request Failed: " + err);
+            });
+            //renderCoordinate();
+            //render();
             setGradients();
         });
     </script>

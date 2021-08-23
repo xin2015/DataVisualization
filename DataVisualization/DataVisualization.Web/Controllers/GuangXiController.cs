@@ -6,9 +6,9 @@ using System.Web.Mvc;
 
 namespace DataVisualization.Web.Controllers
 {
-    public class XiZangController : Controller
+    public class GuangXiController : Controller
     {
-        // GET: XiZang
+        // GET: GuangXi
         public ActionResult Index()
         {
             return View();
@@ -20,21 +20,6 @@ namespace DataVisualization.Web.Controllers
         }
 
         public ActionResult Index3()
-        {
-            return View();
-        }
-
-        public ActionResult Index4()
-        {
-            return View();
-        }
-
-        public ActionResult Index5()
-        {
-            return View();
-        }
-
-        public ActionResult Index6()
         {
             return View();
         }

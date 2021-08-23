@@ -129,6 +129,7 @@
     </Compile>
     <Compile Include="Controllers\EChartsController.cs" />
     <Compile Include="Controllers\GISController.cs" />
+    <Compile Include="Controllers\GuangXiController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\KrigingController.cs" />
     <Compile Include="Controllers\OpenLayersController.cs" />
@@ -258,6 +259,12 @@
     <Content Include="Scripts\data\20210720\20210720000000_wspd_100.json" />
     <Content Include="Scripts\data\20210720\20210720000000_wspd_200.json" />
     <Content Include="Scripts\data\20210720\20210720000000_wspd_500.json" />
+    <Content Include="Scripts\data\20210720\chongqinglat.json" />
+    <Content Include="Scripts\data\20210720\chongqinglon.json" />
+    <Content Include="Scripts\data\20210720\chongqingtemperature.json" />
+    <Content Include="Scripts\data\20210720\chongqingtemperature1.json" />
+    <Content Include="Scripts\data\LPDM_100200_1km_so2_daily_20210813.json" />
+    <Content Include="Scripts\data\LPDM_450100125_daily_20210812.json" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\echarts\echarts.js" />
     <Content Include="Scripts\echarts\echarts.min.js" />
@@ -373,6 +380,10 @@
     <Content Include="Views\OpenLayers\Turf.cshtml" />
     <Content Include="Views\GIS\Contours.cshtml" />
     <Content Include="Views\XiZang\Index5.cshtml" />
+    <Content Include="Views\XiZang\Index6.cshtml" />
+    <Content Include="Views\GuangXi\Index.cshtml" />
+    <Content Include="Views\GuangXi\Index2.cshtml" />
+    <Content Include="Views\GuangXi\Index3.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

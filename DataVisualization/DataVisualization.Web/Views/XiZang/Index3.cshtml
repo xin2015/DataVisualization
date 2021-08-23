@@ -229,23 +229,24 @@
         var renderSource = new ol.source.ImageCanvas({
             canvasFunction: (extent, resolution, pixelRatio, size, projection) => {
                 var canvas = document.createElement('canvas');
-                canvas.width = Math.round(size[0]);
-                canvas.height = Math.round(size[1]);
+                canvas.width = Math.round(size[0] * pixelRatio);
+                canvas.height = Math.round(size[1] * pixelRatio);
                 var ctx = canvas.getContext("2d");
-                ctx.scale(pixelRatio, pixelRatio);
+                //ctx.scale(pixelRatio, pixelRatio);
                 if (temperatureData && lonData && latData) {
                     console.time("render");
                     var zoom = map.getView().getZoom();
-                    var indexResolution = Math.pow(2, mapZoom - zoom) * 0.4;
-                    var pixelStatus = [canvas.width * canvas.height];
-                    for (var i = 0; i < temperatureData.rowCount; i += indexResolution) {
-                        for (var j = 0; j < temperatureData.colCount; j += indexResolution) {
-                            var point = [bilinearInterpolate(i, j, lonData.data, lonData.colCount), bilinearInterpolate(i, j, latData.data, latData.colCount)];
+                    var indexResolution = Math.pow(2, mapZoom - zoom) * 0.8 / pixelRatio;
+                    var iMax = temperatureData.rowCount - 1, jMax = temperatureData.colCount - 1;
+                    for (var i = 0; i <= iMax; i += indexResolution) {
+                        for (var j = 0; j <= jMax; j += indexResolution) {
+                            var point = [bilinearInterpolate(i, j, lonData.data, lonData.colCount, lonData.rowCount), bilinearInterpolate(i, j, latData.data, latData.colCount, latData.rowCount)];
                             point = ol.proj.fromLonLat(point);
-                            var pixel = map.getPixelFromCoordinate(point);
-                            if (pixel[0] >= 0 && pixel[0] < canvas.width && pixel[1] >= 0 && pixel[1] < canvas.height) {
+                            if (point[0] >= extent[0] && point[0] <= extent[2] && point[1] >= extent[1] && point[1] <= extent[3]) {
+                                var pixel = map.getPixelFromCoordinate(point);
+                                pixel = [Math.round(pixel[0] * pixelRatio), Math.round(pixel[1] * pixelRatio)];
                                 ctx.fillStyle = getColorFunc(bilinearInterpolate(i, j, temperatureData.data, temperatureData.colCount));
-                                ctx.fillRect(pixel[0], pixel[1], 1, 1);
+                                ctx.fillRect(pixel[0], pixel[1], 2, 2);
                             }
                         }
                     }
@@ -350,11 +351,29 @@
             })
         });
         // 双线性插值
-        function bilinearInterpolate(i, j, data, colCount) {
-            var i0 = Math.floor(i);
+        function bilinearInterpolate(i, j, data, colCount, rowCount) {
+            var i0 = Math.floor(i), j0 = Math.floor(j);
+            if (i == i0 && j == j0) {
+                return data[i0 * colCount + j0];
+            }
             var i1 = i == i0 ? i + 1 : Math.ceil(i);
-            var j0 = Math.floor(j);
             var j1 = j == j0 ? j + 1 : Math.ceil(j);
+            if (i0 == -1) {
+                i0++;
+                i1++;
+            }
+            if (i1 == rowCount) {
+                i0--;
+                i1--;
+            }
+            if (j0 == -1) {
+                j0++;
+                j1++;
+            }
+            if (j1 == colCount) {
+                j0--;
+                j1--;
+            }
             var di0 = i - i0, di1 = i1 - i;
             var dj0 = j - j0, dj1 = j1 - j;
             return data[i0 * colCount + j0] * di1 * dj1 + data[i0 * colCount + j1] * di1 * dj0 + data[i1 * colCount + j0] * di0 * dj1 + data[i1 * colCount + j1] * di0 * dj0;
@@ -363,7 +382,6 @@
         function render() {
             $.getJSON("/Scripts/data/20210720/20210720000000_temperature_500.json").done(function (json) {
                 temperatureData = json;
-
                 renderSource.refresh();
             }).fail(function (jqxhr, textStatus, error) {
                 temperatureData = null;

@@ -110,8 +110,8 @@
     <script type="text/javascript">
         var isGradient = true;
         var polylineStatus = true;
-        var mapCenter = ol.proj.fromLonLat([88.695901, 32.041647]);
-        var mapZoom = 5;
+        var mapCenter = ol.proj.fromLonLat([101.03, 19.55]);
+        var mapZoom = 7;
         var mapProjection = ol.proj.get('EPSG:3857'); // 投影坐标系
         var mapProjectionExtent = mapProjection.getExtent(); // 投影坐标系范围
         var mapProjectionSize = ol.extent.getWidth(mapProjectionExtent) / 256;
@@ -154,7 +154,7 @@
             g: 0,
             b: 8
         }];
-        var levels = [-10, 0, 10, 20, 30, 40, 50];
+        var levels = [-13, -11, -9, -7, -5, -3, -1];
         var gradients;
         var getColorFunc = getLevelColor;
         function getLevelColor(lt) {
@@ -180,7 +180,10 @@
                     break;
                 }
             }
-            return 'rgb(' + r + ',' + g + ',' + b + ')';
+            if (r) {
+                return 'rgb(' + r + ',' + g + ',' + b + ')';
+            }
+            return 'rgba(0,0,0,0)';
         }
         function setGradients() {
             gradients = [];
@@ -196,6 +199,7 @@
             return 'rgb(' + color.r + ',' + color.g + ',' + color.b + ')';
         }
         var temperatureData, lonData, latData;
+        var contours;
         var vecSource = new ol.source.TileImage({
             projection: mapProjection,
             tileGrid: new ol.tilegrid.TileGrid({
@@ -233,28 +237,31 @@
                 canvas.height = Math.round(size[1]);
                 var ctx = canvas.getContext("2d");
                 ctx.scale(pixelRatio, pixelRatio);
-                if (temperatureData && lonData && latData) {
+                if (contours && lonData && latData) {
                     console.time("render");
-                    var zoom = map.getView().getZoom();
-                    var indexResolution = Math.pow(2, mapZoom - zoom) * 0.1;
-                    //var indexResolution = 1;
-                    var pixelStatus = [canvas.width * canvas.height];
-                    var iMax = temperatureData.rowCount - 1, jMax = temperatureData.colCount - 1;
-                    for (var i = 0; i <= iMax; i += indexResolution) {
-                        for (var j = 0; j <= jMax; j += indexResolution) {
-                            var point = [bilinearInterpolate(i, j, lonData.data, lonData.colCount), bilinearInterpolate(i, j, latData.data, latData.colCount)];
-                            point = ol.proj.fromLonLat(point);
-                            if (point[0] >= extent[0] && point[0] <= extent[2] && point[1] >= extent[1] && point[1] <= extent[3]) {
+                    contours.forEach(function (geometry) {
+                        ctx.beginPath();
+                        for (var i = 0; i < geometry.coordinates.length; i++) {
+                            var polygon = geometry.coordinates[i];
+                            for (var j = 0; j < polygon.length; j++) {
+                                var points = polygon[j];
+                                var point = [points[0][0] - 0.5, points[0][1] - 0.5];
+                                point = [bilinearInterpolate(point[1], point[0], lonData.data, lonData.colCount, lonData.rowCount), bilinearInterpolate(point[1], point[0], latData.data, latData.colCount, latData.rowCount)];
+                                point = ol.proj.fromLonLat(point);
                                 var pixel = map.getPixelFromCoordinate(point);
-                                pixel = [Math.round(pixel[0]), Math.round(pixel[1])];
-                                if (!pixelStatus[pixel[0] + pixel[1] * canvas.width]) {
-                                    ctx.fillStyle = getColorFunc(bilinearInterpolate(i, j, temperatureData.data, temperatureData.colCount));
-                                    ctx.fillRect(pixel[0], pixel[1], 1, 1);
-                                    pixelStatus[pixel[0] + pixel[1] * canvas.width] = true;
+                                ctx.moveTo(pixel[0], pixel[1]);
+                                for (var k = 1; k < points.length; k++) {
+                                    point = [points[k][0] - 0.5, points[k][1] - 0.5];
+                                    point = [bilinearInterpolate(point[1], point[0], lonData.data, lonData.colCount, lonData.rowCount), bilinearInterpolate(point[1], point[0], latData.data, latData.colCount, latData.rowCount)];
+                                    point = ol.proj.fromLonLat(point);
+                                    pixel = map.getPixelFromCoordinate(point);
+                                    ctx.lineTo(pixel[0], pixel[1]);
                                 }
                             }
                         }
-                    }
+                        ctx.fillStyle = getColorFunc(geometry.value);
+                        ctx.fill();
+                    });
                     console.timeEnd("render");
                 }
                 return canvas;
@@ -356,13 +363,29 @@
             })
         });
         // 双线性插值
-        function bilinearInterpolate(i, j, data, colCount) {
+        function bilinearInterpolate(i, j, data, colCount, rowCount) {
             var i0 = Math.floor(i), j0 = Math.floor(j);
             if (i == i0 && j == j0) {
                 return data[i0 * colCount + j0];
             }
             var i1 = i == i0 ? i + 1 : Math.ceil(i);
             var j1 = j == j0 ? j + 1 : Math.ceil(j);
+            if (i0 == -1) {
+                i0++;
+                i1++;
+            }
+            if (i1 == rowCount) {
+                i0--;
+                i1--;
+            }
+            if (j0 == -1) {
+                j0++;
+                j1++;
+            }
+            if (j1 == colCount) {
+                j0--;
+                j1--;
+            }
             var di0 = i - i0, di1 = i1 - i;
             var dj0 = j - j0, dj1 = j1 - j;
             return data[i0 * colCount + j0] * di1 * dj1 + data[i0 * colCount + j1] * di1 * dj0 + data[i1 * colCount + j0] * di0 * dj1 + data[i1 * colCount + j1] * di0 * dj0;
@@ -400,8 +423,90 @@
         }
 
         $(document).ready(function () {
-            renderCoordinate();
-            render();
+            $.getJSON("/Scripts/data/LPDM_100200_1km_so2_daily_20210813.json").done(function (json) {
+                var loni = 180, lona = 0, lati = 90, lata = 0, valuei = 9999, valuea = -9999;
+                for (var i = 0; i < json.length; i++) {
+                    var item = json[i];
+                    if (item.lon > lona) {
+                        lona = item.lon;
+                    }
+                    if (item.lon < loni) {
+                        loni = item.lon;
+                    }
+                    if (item.lat > lata) {
+                        lata = item.lat;
+                    }
+                    if (item.lat < lati) {
+                        lati = item.lat;
+                    }
+                    if (item.TOT > valuea) {
+                        valuea = item.TOT;
+                    }
+                    if (item.TOT < valuei) {
+                        valuei = item.TOT;
+                    }
+                }
+                lati = Math.round(lati * 10) / 10;
+                var colCount = Math.round((lona - loni) / 0.1 + 1), rowCount = Math.round((lata - lati) / 0.1 + 1);
+                temperatureData = {
+                    colCount: colCount,
+                    rowCount: rowCount,
+                    data: []
+                };
+                lonData = {
+                    colCount: temperatureData.colCount,
+                    rowCount: temperatureData.rowCount,
+                    data: []
+                };
+                latData = {
+                    colCount: temperatureData.colCount,
+                    rowCount: temperatureData.rowCount,
+                    data: []
+                };
+                for (var i = 0, k = 0; i < rowCount; i++) {
+                    var lat = lati + i * 0.1;
+                    for (var j = 0; j < colCount; j++, k++) {
+                        var lon = loni + j * 0.1;
+                        lonData.data[k] = lon;
+                        latData.data[k] = lat;
+                        var value = NaN;
+                        for (var l = 0; l < json.length; l++) {
+                            var item = json[l];
+                            if (item.lon == lon && item.lat == lat) {
+                                value = item.TOT;
+                                break;
+                            } else {
+                                value = -999;
+                            }
+                        }
+                        temperatureData.data[k] = value;
+                    }
+                }
+                var contourLevels = levels;
+                if (isGradient) {
+                    for (; contourLevels.length < 200;) {
+                        var temp = [];
+                        for (var i = 1; i < contourLevels.length; i++) {
+                            temp.push(contourLevels[i - 1]);
+                            temp.push((contourLevels[i - 1] + contourLevels[i]) / 2);
+                        }
+                        temp.push(contourLevels[contourLevels.length - 1]);
+                        contourLevels = temp;
+                    }
+                }
+                contours = d3.contours()
+                    .size([temperatureData.colCount, temperatureData.rowCount])
+                    .smooth(true)
+                    .thresholds(contourLevels)(temperatureData.data);
+                renderSource.refresh();
+            }).fail(function (jqxhr, textStatus, error) {
+                temperatureData = null;
+                renderSource.refresh();
+                var err = textStatus + ", " + error;
+                console.log("Request Failed: " + err);
+            });
+            //renderCoordinate();
+            //render();
             setGradients();
         });
     </script>

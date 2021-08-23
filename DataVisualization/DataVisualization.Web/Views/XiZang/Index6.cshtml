@@ -120,6 +120,7 @@
         for (var i = 0; i <= mapMaxZoom; i++) {
             mapResolutions[i] = mapProjectionSize / Math.pow(2, i);
         }
+        console.log(mapResolutions);
         var wrapX = true;
         var colors = [{
             r: 128,
@@ -154,7 +155,7 @@
             g: 0,
             b: 8
         }];
-        var levels = [-10, 0, 10, 20, 30, 40, 50];
+        var levels = [-10, -5, -2, 0, 2, 5, 10];
         var gradients;
         var getColorFunc = getLevelColor;
         function getLevelColor(lt) {
@@ -236,22 +237,17 @@
                 if (temperatureData && lonData && latData) {
                     console.time("render");
                     var zoom = map.getView().getZoom();
-                    var indexResolution = Math.pow(2, mapZoom - zoom) * 0.1;
-                    //var indexResolution = 1;
-                    var pixelStatus = [canvas.width * canvas.height];
+                    var indexResolution = Math.pow(2, mapZoom - zoom) * 0.8;
                     var iMax = temperatureData.rowCount - 1, jMax = temperatureData.colCount - 1;
                     for (var i = 0; i <= iMax; i += indexResolution) {
                         for (var j = 0; j <= jMax; j += indexResolution) {
-                            var point = [bilinearInterpolate(i, j, lonData.data, lonData.colCount), bilinearInterpolate(i, j, latData.data, latData.colCount)];
+                            var point = [bilinearInterpolate(i, j, lonData.data, lonData.colCount, lonData.rowCount), bilinearInterpolate(i, j, latData.data, latData.colCount, latData.rowCount)];
                             point = ol.proj.fromLonLat(point);
                             if (point[0] >= extent[0] && point[0] <= extent[2] && point[1] >= extent[1] && point[1] <= extent[3]) {
                                 var pixel = map.getPixelFromCoordinate(point);
-                                pixel = [Math.round(pixel[0]), Math.round(pixel[1])];
-                                if (!pixelStatus[pixel[0] + pixel[1] * canvas.width]) {
-                                    ctx.fillStyle = getColorFunc(bilinearInterpolate(i, j, temperatureData.data, temperatureData.colCount));
-                                    ctx.fillRect(pixel[0], pixel[1], 1, 1);
-                                    pixelStatus[pixel[0] + pixel[1] * canvas.width] = true;
-                                }
+                                //pixel = [Math.round(pixel[0]), Math.round(pixel[1])];
+                                ctx.fillStyle = getColorFunc(bilinearInterpolate(i, j, temperatureData.data, temperatureData.colCount));
+                                ctx.fillRect(pixel[0], pixel[1], 2, 2);
                             }
                         }
                     }
@@ -356,20 +352,36 @@
             })
         });
         // 双线性插值
-        function bilinearInterpolate(i, j, data, colCount) {
+        function bilinearInterpolate(i, j, data, colCount, rowCount) {
             var i0 = Math.floor(i), j0 = Math.floor(j);
             if (i == i0 && j == j0) {
                 return data[i0 * colCount + j0];
             }
             var i1 = i == i0 ? i + 1 : Math.ceil(i);
             var j1 = j == j0 ? j + 1 : Math.ceil(j);
+            if (i0 == -1) {
+                i0++;
+                i1++;
+            }
+            if (i1 == rowCount) {
+                i0--;
+                i1--;
+            }
+            if (j0 == -1) {
+                j0++;
+                j1++;
+            }
+            if (j1 == colCount) {
+                j0--;
+                j1--;
+            }
             var di0 = i - i0, di1 = i1 - i;
             var dj0 = j - j0, dj1 = j1 - j;
             return data[i0 * colCount + j0] * di1 * dj1 + data[i0 * colCount + j1] * di1 * dj0 + data[i1 * colCount + j0] * di0 * dj1 + data[i1 * colCount + j1] * di0 * dj0;
         }
 
         function render() {
-            $.getJSON("/Scripts/data/20210720/chongqingtemperature.json").done(function (json) {
+            $.getJSON("/Scripts/data/20210720/20210720000000_temperature_500.json").done(function (json) {
                 temperatureData = json;
                 renderSource.refresh();
             }).fail(function (jqxhr, textStatus, error) {
@@ -381,7 +393,7 @@
         }
 
         function renderCoordinate() {
-            $.getJSON("/Scripts/data/20210720/chongqinglon.json").done(function (json) {
+            $.getJSON("/Scripts/data/20210720/20210720000000_lon.json").done(function (json) {
                 lonData = json;
                 renderSource.refresh();
             }).fail(function (jqxhr, textStatus, error) {
@@ -389,7 +401,7 @@
                 var err = textStatus + ", " + error;
                 console.log("Request Failed: " + err);
             });
-            $.getJSON("/Scripts/data/20210720/chongqinglat.json").done(function (json) {
+            $.getJSON("/Scripts/data/20210720/20210720000000_lat.json").done(function (json) {
                 latData = json;
                 renderSource.refresh();
             }).fail(function (jqxhr, textStatus, error) {
